@@ -10,7 +10,7 @@ function Login() {
 
     const handleLogin = () => {
         if (username === 'admin' && password === '123') {
-            navigate('/order'); // ✅ redirect ke halaman Order
+            navigate('/order');
         } else {
             alert('Username atau password salah!');
         }
