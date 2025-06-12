@@ -1,14 +1,19 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import logo from './assets/logo.png';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+     const navigate = useNavigate();
 
     const handleLogin = () => {
-        // Implement login logic here
-        console.log('Logging in with', username, password);
+        if (username === 'admin' && password === '123') {
+            navigate('/order'); // ✅ redirect ke halaman Order
+        } else {
+            alert('Username atau password salah!');
+        }
     };
 
     return (
