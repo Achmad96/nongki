@@ -1,0 +1,46 @@
+import { useState } from 'react';
+import './Login.css';
+import logo from './assets/logo.png';
+
+function Login() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleLogin = () => {
+        // Implement login logic here
+        console.log('Logging in with', username, password);
+    };
+
+    return (
+        <>
+            <div className="card">
+                <div>
+                    <img src={logo} alt="Logo" className="logo" />
+                    <h3 className="title">Login into your account</h3>
+                </div>
+                <div className="login-container">
+                    <label htmlFor='username'>Username</label>
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <label htmlFor='password'>Password</label>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button onClick={handleLogin}>Login</button>
+                    <p className="register-link">
+                        Don't have an account? <a href="/register">Register</a>
+                    </p>
+                </div>
+            </div>
+        </>
+    );
+}
+
+export default Login;
