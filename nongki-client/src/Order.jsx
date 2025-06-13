@@ -4,8 +4,8 @@ import logo from './assets/logo.png';
 
 function Order() {
     return (
-        <div id='root'>
-            <img src={logo} alt="Nongki Logo" className='logo' />
+        <div className='order-page'>
+            <img src={logo} alt="Nongki Logo" className='logo-order' />
             <div className='card-order'>
                 <h3 className='title-order'>Booking Space</h3>
             </div>

@@ -1,21 +1,26 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import logo from './assets/logo.png';
 
 function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleLogin = () => {
-        // Implement login logic here
-        console.log('Logging in with', username, password);
+        if (username === 'admin' && password === '123') {
+            navigate('/order');
+        } else {
+            alert('Username atau password salah!');
+        }
     };
 
     return (
-        <>
+        <div className="login-page">
             <div className="card">
                 <div>
-                    <img src={logo} alt="Logo" className="logo" />
+                    <img src={logo} alt="Logo" className="logo-login" />
                     <h3 className="title">Login into your account</h3>
                 </div>
                 <div className="login-container">
@@ -39,7 +44,7 @@ function Login() {
                     </p>
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
