@@ -14,9 +14,9 @@ const Hero = () => (
         <a href="#">Beranda</a>
         <a href="#location">Lokasi</a>
         <a href="#product">Produk</a>
-        <a href="#">Kontak</a>
+        <a href="#footer">Kontak</a>
       </div>
-      <Link to="/" className="booking-btn">Pesan</Link>
+      <Link to="/login" className="booking-btn">Pesan</Link>
     </div>
     {/* Main Content */}
     <div className="container">
@@ -31,7 +31,7 @@ const Hero = () => (
           since the 1500s, when an unknown printer took a galley of type and
           scrambled it to make a type specimen book.
         </p>
-        <Link to="/" className="cta-btn">Pesan Sekarang</Link>
+        <Link to="/login" className="cta-btn">Pesan Sekarang</Link>
       </div>
       <div className="right-content">
         <img

@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap');
+
+.testimoni-section {
+  font-family: 'Poppins', Arial, sans-serif;
+  max-width: 1200px;
+  margin: 190px auto 0 auto;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.testimoni-title {
+  color: #FFC107;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 36px;
+  letter-spacing: 1px;
+}
+
+.testimoni-list {
+  display: flex; 
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+.testimoni-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  padding: 32px 28px 24px 28px;
+  max-width: 340px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.2s;
+}
+
+.testimoni-card:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+}
+
+.testimoni-text {
+  font-size: 1.05rem;
+  color: #222;
+  margin-bottom: 28px;
+  line-height: 1.6;
+  min-height: 120px;
+}
+
+.testimoni-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+  border: 3px solid #eee;
+}
+
+.testimoni-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+  color: #222;
+}
+
+.testimoni-role {
+  font-size: 0.98rem;
+  color: #888;
+}
+
+@media (max-width: 900px) {
+  .testimoni-list {
+    grid-template-columns: 1fr;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+  }
+  .testimoni-card {
+    max-width: 100%;
+    width: 100%;
+  }
+}
