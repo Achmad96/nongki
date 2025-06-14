@@ -24,6 +24,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles AuthRejectedException and returns a 406 Not Acceptable.
+     *
+     * @param exception the exception to handle
+     * @return a ResponseEntity with a 406 Not Acceptable status and the exception message
+     */
+    @ExceptionHandler(AuthRejectedException.class)
+    public ResponseEntity<?> handleAuthRejectedException(AuthRejectedException exception) {
+        return ResponseEntity.status(406).body(response(false, exception.getMessage(), null));
+    }
+
+    /**
      * Handles MethodArgumentNotValidException and returns a 400 Bad Request response
      * with validation errors.
      *

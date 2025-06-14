@@ -1,5 +1,7 @@
 package me.app.nongki.service;
 
+import me.app.nongki.dto.UserDTO;
+import me.app.nongki.exception.AuthRejectedException;
 import me.app.nongki.exception.ResourceNotFoundException;
 import me.app.nongki.model.User;
 import me.app.nongki.repository.UserRepository;
@@ -9,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class UserService {
@@ -35,15 +36,15 @@ public class UserService {
     public void login(String name, String password) {
         final User user = userRepository.findbyName(name);
         if (user == null) {
-            throw new ResourceNotFoundException("User not found");
+            throw new AuthRejectedException("Username or password is incorrect.");
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid password for user: " + name);
+            throw new AuthRejectedException("Invalid password for user: " + name);
         }
         log.info("User {} logged in successfully", name);
     }
 
-    public User updateUser(UUID id, User user) {
+    public User updateUser(String id, User user) {
         final User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
         if (user.getName() != null) {
@@ -52,12 +53,11 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-    public List<User> getUsers() {
-        return userRepository.findAll();
+    public List<UserDTO> getUsers() {
+        return userRepository.getAll();
     }
 
-    public User getUserById(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+    public UserDTO getUserById(String id) {
+        return userRepository.getUserById(id);
     }
 }

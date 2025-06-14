@@ -1,13 +1,13 @@
 package me.app.nongki.controller;
 
 
+import me.app.nongki.dto.UserDTO;
 import me.app.nongki.model.User;
 import me.app.nongki.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
@@ -20,18 +20,18 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/")
-    public ResponseEntity<List<User>> all() {
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> all() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<User> one(@PathVariable UUID id) {
+    public ResponseEntity<UserDTO> one(@PathVariable String id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<User> update(@PathVariable UUID id, @RequestBody User user) {
+    public ResponseEntity<User> update(@PathVariable String id, @RequestBody User user) {
         return ResponseEntity.ok(userService.updateUser(id, user));
     }
 }
