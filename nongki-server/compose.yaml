@@ -1,0 +1,11 @@
+services:
+  db:
+    image: mysql
+    restart: always
+    volumes:
+        - ./db:/var/lib/mysql
+    environment:
+        MYSQL_DATABASE: nongki
+        MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+        - "3306:3306"
