@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../../Styles/Hero.css";
 
 const Hero = () => (
@@ -11,11 +12,11 @@ const Hero = () => (
       </div>
       <div className="nav-menu">
         <a href="#">Beranda</a>
-        <a href="#">Lokasi</a>
-        <a href="#">Produk</a>
+        <a href="#location">Lokasi</a>
+        <a href="#product">Produk</a>
         <a href="#">Kontak</a>
       </div>
-      <button className="booking-btn">Pesan</button>
+      <Link to="/" className="booking-btn">Pesan</Link>
     </div>
     {/* Main Content */}
     <div className="container">
@@ -30,7 +31,7 @@ const Hero = () => (
           since the 1500s, when an unknown printer took a galley of type and
           scrambled it to make a type specimen book.
         </p>
-        <button className="cta-btn">Pesan Sekarang</button>
+        <Link to="/" className="cta-btn">Pesan Sekarang</Link>
       </div>
       <div className="right-content">
         <img

@@ -24,7 +24,7 @@ const meetingProduct = {
 };
 
 const Product = () => (
-<section className="product-section">
+<section className="product-section" id="product">
     <h2 className="product-title">Produk Kami</h2>
     <div className="product-scroll">
     {products.map((item, idx) => (
