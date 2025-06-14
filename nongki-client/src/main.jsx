@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login';
 import Order from './Order';
-import Landing from './Landing';
+import Landing from './pages/Landing';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
