@@ -5,8 +5,10 @@
     text-align: center;
 }
 
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap');
 
 html, body {
+    font-family: 'Poppins', Arial, sans-serif;
     height: 100%;
     margin: 0;
 }
