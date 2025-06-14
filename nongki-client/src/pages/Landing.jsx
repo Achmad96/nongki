@@ -1,8 +1,9 @@
 import React from "react";
-import Hero from "./Hero";
-import About from "./About";
-import WhyUs from "./WhyUs";
-import Product from "./Product";
+import Hero from '../Components/Landing/Hero';
+import About from '../Components/Landing/About';
+import WhyUs from '../Components/Landing/WhyUs';
+import Product from '../Components/Landing/Product';
+import Location from '../Components/Landing/Location';
 
 
 const Landing = () => (
@@ -14,6 +15,7 @@ const Landing = () => (
     <About />
     <WhyUs />
     <Product />
+    <Location />
   </div>
   </div>
 );

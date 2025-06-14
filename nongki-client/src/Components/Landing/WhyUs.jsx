@@ -1,5 +1,5 @@
 import React from "react";
-import "./WhyUs.css";
+import "../../Styles/WhyUs.css";
 import { FaWifi, FaPrint, FaSyncAlt, FaSmoking, FaSmokingBan, FaMosque, FaSnowflake, FaClock } from "react-icons/fa";
 
 const features = [
