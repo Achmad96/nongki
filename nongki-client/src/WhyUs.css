@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,700&display=swap');
+
+.whyus-section {
+  font-family: 'Poppins', Arial, sans-serif;
+  max-width: 1300px;
+  margin: 150px auto 0 auto;
+  text-align: center;
+  padding: 0 40px;
+}
+
+.whyus-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 36px;
+}
+
+.whyus-highlight {
+  color: #FFC107;
+  font-weight: 700;
+}
+
+.whyus-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+.whyus-card {
+  background: #333;
+  color: #fff;
+  border-radius: 14px;
+  width: 230px;
+  min-height: 180px;
+  padding: 28px 18px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+
+.whyus-card:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+}
+
+.whyus-icon {
+  color: #FFC107;
+  font-size: 2.1rem;
+  margin-bottom: 18px;
+}
+
+.whyus-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.whyus-card-desc {
+  font-size: 0.95rem;
+  color: #e0e0e0;
+  font-weight: 400;
+}
+
+.whyus-footer {
+  margin-top: 32px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 900px) {
+  .whyus-cards {
+    gap: 18px;
+  }
+  .whyus-card {
+    width: 100%;
+    min-width: 0;
+    align-items: flex-start;
+    margin: 0 auto;
+  }
+}
