@@ -1,5 +1,7 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ProtectedRoute from './Components/ProtectedRoute';
+import GuestRoute from './Components/GuestRoute';
 
 const Landing = lazy(() => import('./pages/Landing'));
 const Login = lazy(() => import('./pages/Login'));
@@ -49,11 +51,11 @@ function App() {
             <Suspense fallback={<PageLoader />}>
                 <Routes>
                     <Route path="/" element={<Landing />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/order" element={<Order />} />
-                    <Route path="/map" element={<Map />} />
-                    <Route path="/confirm" element={<Confirm />} />
+                    <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+                    <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+                    <Route path="/order" element={<ProtectedRoute><Order /></ProtectedRoute>} />
+                    <Route path="/map" element={<ProtectedRoute><Map /></ProtectedRoute>} />
+                    <Route path="/confirm" element={<ProtectedRoute><Confirm /></ProtectedRoute>} />
                 </Routes>
             </Suspense>
         </BrowserRouter>

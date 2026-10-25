@@ -51,6 +51,11 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(response(false, "Error: Data is not valid.", errors));
   }
 
+  @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+  public ResponseEntity<?> handleHttpMessageNotReadableException(org.springframework.http.converter.HttpMessageNotReadableException exception) {
+    return ResponseEntity.badRequest().body(response(false, "Malformed request payload or invalid JSON format.", null));
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<?> handleGlobalException(Exception exception) {
     return ResponseEntity.internalServerError().body(response(false, exception.getMessage(), null));

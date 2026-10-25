@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { authApi, setAuthToken } from '../services/api';
 import { Button } from '../Components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../Components/ui/card';
 import { Input } from '../Components/ui/input';
 import { Label } from '../Components/ui/label';
-import { User, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, CheckCircle } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, CheckCircle, Info } from 'lucide-react';
 
 export default function Login() {
     const [identifier, setIdentifier] = useState('');
@@ -16,6 +16,21 @@ export default function Login() {
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const isSessionExpired = useMemo(() => {
+        return new URLSearchParams(location.search).get('expired') === '1';
+    }, [location.search]);
+
+    const redirectNotice = useMemo(() => {
+        if (location.state?.from) {
+            return 'Please sign in to access your reservation workspace.';
+        }
+        if (isSessionExpired) {
+            return 'Your previous session has expired. Please sign in again.';
+        }
+        return '';
+    }, [location.state, isSessionExpired]);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -39,7 +54,7 @@ export default function Login() {
             const isEmail = trimmedIdentifier.includes('@');
             const loginPayload = isEmail
                 ? { email: trimmedIdentifier, password }
-                : { username: trimmedIdentifier, password };
+                : { username: trimmedIdentifier, email: trimmedIdentifier, password };
 
             const response = await authApi.login(loginPayload);
 
@@ -49,10 +64,11 @@ export default function Login() {
 
                 if (token) {
                     setAuthToken(token, tokenExpireIn, trimmedIdentifier);
-                    setSuccessMessage('Login successful! Redirecting to reservation...');
+                    setSuccessMessage('Login successful! Redirecting...');
+                    const destination = location.state?.from?.pathname || '/order';
                     setTimeout(() => {
-                        navigate('/order');
-                    }, 1000);
+                        navigate(destination, { replace: true });
+                    }, 800);
                 } else {
                     setErrorMessage('Login succeeded but token was missing. Please try again.');
                 }
@@ -90,6 +106,13 @@ export default function Login() {
 
                 <form onSubmit={handleLogin}>
                     <CardContent className="space-y-4">
+                        {redirectNotice && !errorMessage && !successMessage && (
+                            <div className="flex items-center gap-2.5 rounded-xl border border-[#feb600]/30 bg-[#feb600]/10 px-3.5 py-2.5 text-xs font-medium text-[#feb600]">
+                                <Info className="h-4 w-4 shrink-0 text-[#feb600]" />
+                                <span>{redirectNotice}</span>
+                            </div>
+                        )}
+
                         {errorMessage && (
                             <div className="flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-xs font-medium text-red-300">
                                 <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
