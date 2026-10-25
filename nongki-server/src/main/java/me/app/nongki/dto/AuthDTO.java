@@ -1,23 +1,3 @@
-package me.app.nongki.entity;
+package me.app.nongki.dto;
 
-public class LoginResponse {
-  private String token;
-
-  private long expiresIn;
-
-  public String getToken() {
-    return token;
-  }
-
-  public void setExpiresIn(long expiresIn) {
-    this.expiresIn = expiresIn;
-  }
-
-  public long getExpiresIn() {
-    return expiresIn;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
-}
+public record AuthDTO (String token, String expireIn) {}

@@ -3,18 +3,19 @@ package me.app.nongki.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "user")
 public class User implements UserDetails {
 
   @Id
+  @UuidGenerator
   private String id;
 
   @Column(name = "nama")
@@ -30,20 +31,18 @@ public class User implements UserDetails {
   @Size(min = 8, message = "Password must be at least 8 characters")
   private String password;
 
-  @Size(min = 10, max = 15, message = "Nomor telepon must be between 10 and 15 characters")
-  private String nomor_telepon;
+  @Column(name = "nomor_telepon")
+  @Size(min = 10, max = 15, message = "Phone number must be between 10 and 15 characters")
+  private String phoneNumber;
 
-  public User(String email, String name, String password,  String nomor_telepon) {
-    this.id = UUID.randomUUID().toString();
+  public User(String email, String name, String password,  String phoneNumber) {
     this.email = email;
     this.name = name;
     this.password = password;
-    this.nomor_telepon = nomor_telepon;
+    this.phoneNumber = phoneNumber;
   }
 
-  public User() {
-    this.id = UUID.randomUUID().toString();
-  }
+  public User() {}
 
   public String getId() {
     return id;
@@ -75,11 +74,11 @@ public class User implements UserDetails {
     return email;
   }
 
-  public void setNomorTelepon(String nomor_telepon) {
-    this.nomor_telepon = nomor_telepon;
+  public void setPhoneNumber(String phoneNumber) {
+    this.phoneNumber = phoneNumber;
   }
 
-  public String getNomorTelepon() {
-    return nomor_telepon;
+  public String getPhoneNumber() {
+    return phoneNumber;
   }
 }

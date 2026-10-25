@@ -6,9 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -35,7 +34,7 @@ public class SecurityConfig {
   }
 
   @Bean
-  UserDetailsService userDetailsService() {
+  public UserDetailsService userDetailsService() {
     return userRepository::findbyEmail;
   }
 
@@ -44,16 +43,14 @@ public class SecurityConfig {
     http
       .authorizeHttpRequests(authorize ->
         authorize
-          // Allow authentication endpoints without requiring authentication
           .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
           .requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll()
-          .anyRequest().authenticated()) // All other requests require authentication
+          .anyRequest().authenticated())
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Use stateless sessions for JWT
-      .httpBasic(AbstractHttpConfigurer::disable) // Disable Basic Authentication
-      .formLogin(AbstractHttpConfigurer::disable) // Disable Form Login
-      .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for stateless APIs
-      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add your JWT filter before the standard username/password filter
-
+      .httpBasic(AbstractHttpConfigurer::disable)
+      .formLogin(AbstractHttpConfigurer::disable)
+      .csrf(AbstractHttpConfigurer::disable)
+      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 
@@ -63,30 +60,22 @@ public class SecurityConfig {
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
-  }
-
-  @Bean
-  public AuthenticationProvider authenticationProvider() {
+  public AuthenticationManager authenticationManager() {
     final DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService()); // Use your custom UserDetailsService
+    authProvider.setUserDetailsService(userDetailsService());
     authProvider.setPasswordEncoder(passwordEncoder());
-    return authProvider;
+    return new ProviderManager(authProvider);
   }
 
   @Bean
-  CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
-
+  public CorsConfigurationSource corsConfigurationSource() {
+    final CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(List.of("http://localhost:8080"));
     configuration.setAllowedMethods(List.of("GET","POST"));
     configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
-
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
+    
+    final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**",configuration);
-
     return source;
   }
 

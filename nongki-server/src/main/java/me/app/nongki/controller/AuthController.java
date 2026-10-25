@@ -1,6 +1,7 @@
 package me.app.nongki.controller;
 
 import jakarta.validation.Valid;
+import me.app.nongki.dto.AuthDTO;
 import me.app.nongki.entity.User;
 import me.app.nongki.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -25,16 +26,16 @@ public class AuthController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(value = "/register")
   public ResponseEntity<?> register(@Valid @RequestBody User user) {
-    authService.register(user.getEmail(), user.getName(), user.getPassword(), user.getNomorTelepon());
+    authService.register(user.getEmail(), user.getName(), user.getPassword(), user.getPhoneNumber());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(response(true, "User registered successfully", null));
   }
 
   @PostMapping(value = "/login")
   public ResponseEntity<?> login(@Valid @RequestBody User user) {
-    HashMap<String, String> tokenResponse = authService.authenticate(user.getEmail(), user.getPassword());
+    final HashMap<String, String> tokenResponse = authService.authenticate(user.getEmail(), user.getPassword());
     return ResponseEntity.status(HttpStatus.OK).body(
-        response(true, "Login successfully", tokenResponse)
+        new AuthDTO(tokenResponse.get("token"), tokenResponse.get("expireIn"))
     );
   }
 }

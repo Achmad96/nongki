@@ -33,7 +33,6 @@ public class AuthService {
       this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-
     public void register(String email, String name, String password, String nomorTelepon) {
         if (userRepository.findbyEmail(email) != null) {
             throw new RuntimeException("User already exists with name: " + name);
@@ -62,6 +61,7 @@ public class AuthService {
         final String token = jwtService.generateToken(user.getUsername());
         final HashMap<String, String> response = new HashMap<>();
         response.put("token", token);
+        response.put("expireIn", String.valueOf(jwtService.extractExpiration(token).getTime()));
         return response;
     }
 

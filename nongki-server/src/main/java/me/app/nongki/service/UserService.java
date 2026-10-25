@@ -29,8 +29,8 @@ public class UserService {
         if (user.getUsername() != null) {
             existingUser.setName(user.getUsername());
         }
-        if (user.getNomorTelepon() != null) {
-            existingUser.setNomorTelepon(user.getNomorTelepon());
+        if (user.getPhoneNumber() != null) {
+            existingUser.setPhoneNumber(user.getPhoneNumber());
         }
         log.info("Updating user with id: {} and name: {}", id, existingUser.getUsername());
         return userRepository.save(existingUser);
