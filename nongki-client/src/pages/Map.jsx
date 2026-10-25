@@ -1,20 +1,32 @@
 import { useState, useEffect } from 'react';
-import '../Styles/Map.css';
 import AppHeader from '../Components/AppHeader';
 import compas from '../assets/compas.png';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { spacesApi, ordersApi } from '../services/api';
-import { 
-    FaArrowLeft, 
-    FaArrowRight, 
-    FaCalendarAlt, 
-    FaClock, 
-    FaLayerGroup, 
-    FaCrown, 
-    FaCheck, 
-    FaReceipt, 
-    FaTimes 
-} from 'react-icons/fa';
+import { Button } from '../Components/ui/button';
+import { Card } from '../Components/ui/card';
+import { Badge } from '../Components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '../Components/ui/dialog';
+import {
+    ArrowLeft,
+    ArrowRight,
+    Calendar,
+    Clock,
+    Sparkles,
+    Check,
+    Receipt,
+    ZoomIn,
+    ZoomOut,
+    RotateCcw,
+    Layers,
+    AlertCircle,
+} from 'lucide-react';
 
 const desks = [
     { id: 'A1', top: 20, left: 20, vertical: false, type: 'Desk', category: 'Reguler' },
@@ -44,62 +56,35 @@ const desks = [
     { id: 'E5', top: 240, left: 250, vertical: false, type: 'Group Desk', category: 'Reguler' },
     { id: 'E6', top: 240, left: 330, vertical: false, type: 'Group Desk', category: 'Reguler' },
 
-    { id: 'F1', top: 340, left: 170, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'F2', top: 340, left: 250, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'F3', top: 340, left: 330, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'F4', top: 380, left: 170, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'F5', top: 380, left: 250, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'F6', top: 380, left: 330, vertical: false, type: 'Group Desk', category: 'VIP' },
+    { id: 'F1', top: 320, left: 170, vertical: false, type: 'Group Desk', category: 'Reguler' },
+    { id: 'F2', top: 320, left: 250, vertical: false, type: 'Group Desk', category: 'Reguler' },
+    { id: 'F3', top: 320, left: 330, vertical: false, type: 'Group Desk', category: 'Reguler' },
+    { id: 'F4', top: 360, left: 170, vertical: false, type: 'Group Desk', category: 'Reguler' },
+    { id: 'F5', top: 360, left: 250, vertical: false, type: 'Group Desk', category: 'Reguler' },
+    { id: 'F6', top: 360, left: 330, vertical: false, type: 'Group Desk', category: 'Reguler' },
 
-    { id: 'G1', top: 480, left: 170, vertical: false, type: 'Group Desk', category: 'Reguler' },
-    { id: 'G2', top: 480, left: 250, vertical: false, type: 'Group Desk', category: 'Reguler' },
-    { id: 'G3', top: 480, left: 330, vertical: false, type: 'Group Desk', category: 'Reguler' },
-    { id: 'G4', top: 520, left: 170, vertical: false, type: 'Group Desk', category: 'Reguler' },
-    { id: 'G5', top: 520, left: 250, vertical: false, type: 'Group Desk', category: 'Reguler' },
-    { id: 'G6', top: 520, left: 330, vertical: false, type: 'Group Desk', category: 'Reguler' },
+    { id: 'G1', top: 470, left: 20, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'G2', top: 470, left: 100, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'G3', top: 510, left: 20, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'G4', top: 510, left: 100, vertical: false, type: 'Desk', category: 'Reguler' },
 
-    { id: 'H1', top: 200, left: 550, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'H2', top: 200, left: 630, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'H3', top: 200, left: 710, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'H4', top: 240, left: 550, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'H5', top: 240, left: 630, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'H6', top: 240, left: 710, vertical: false, type: 'Group Desk', category: 'VIP' },
+    { id: 'H1', top: 570, left: 20, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'H2', top: 570, left: 100, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'H3', top: 610, left: 20, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'H4', top: 610, left: 100, vertical: false, type: 'Desk', category: 'Reguler' },
 
-    { id: 'I1', top: 340, left: 550, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'I2', top: 340, left: 630, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'I3', top: 340, left: 710, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'I4', top: 380, left: 550, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'I5', top: 380, left: 630, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'I6', top: 380, left: 710, vertical: false, type: 'Group Desk', category: 'VIP' },
-
-    { id: 'J1', top: 480, left: 550, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'J2', top: 480, left: 630, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'J3', top: 480, left: 710, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'J4', top: 520, left: 550, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'J5', top: 520, left: 630, vertical: false, type: 'Group Desk', category: 'VIP' },
-    { id: 'J6', top: 520, left: 710, vertical: false, type: 'Group Desk', category: 'VIP' },
-
-    { id: 'K1', top: 200, left: 20, vertical: true, type: 'Desk', category: 'Reguler' },
-    { id: 'K2', top: 310, left: 20, vertical: true, type: 'Desk', category: 'Reguler' },
-    { id: 'K3', top: 420, left: 20, vertical: true, type: 'Desk', category: 'Reguler' },
-    { id: 'K4', top: 530, left: 20, vertical: true, type: 'Desk', category: 'Reguler' },
-    { id: 'K5', top: 200, left: 850, vertical: true, type: 'Desk', category: 'VIP' },
-    { id: 'K6', top: 310, left: 850, vertical: true, type: 'Desk', category: 'VIP' },
-    { id: 'K7', top: 420, left: 850, vertical: true, type: 'Desk', category: 'VIP' },
-    { id: 'K8', top: 530, left: 850, vertical: true, type: 'Desk', category: 'VIP' },
-
-    { id: 'L1', top: 640, left: 20, vertical: true, type: 'Desk', category: 'Reguler' },
-    { id: 'L2', top: 740, left: 100, vertical: false, type: 'Desk', category: 'Reguler' },
-    { id: 'L3', top: 740, left: 240, vertical: false, type: 'Desk', category: 'Reguler' },
+    { id: 'M1', top: 220, left: 540, vertical: true, type: 'Meeting Room', category: 'Reguler' },
+    { id: 'M2', top: 380, left: 540, vertical: true, type: 'Meeting Room', category: 'VIP' },
+    { id: 'M3', top: 540, left: 540, vertical: true, type: 'Meeting Room', category: 'VIP' },
 ];
 
-function MapVip() {
+export default function Map() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const defaultDate = new Date().toISOString().split('T')[0];
-    const bookingState = location.state || {
-        date: defaultDate,
+    const todayStr = new Date().toISOString().split('T')[0];
+    const bookingData = location.state || {
+        date: todayStr,
         startTime: 8,
         endTime: 10,
         timeStartStr: '08:00',
@@ -108,41 +93,101 @@ function MapVip() {
         category: 'VIP',
         pricePerHour: 30000,
         durationHours: 2,
+        estimatedTotalPrice: 60000,
     };
 
-    const { date, startTime, endTime, timeStartStr, timeEndStr, kindOfSpace, category, pricePerHour, durationHours } = bookingState;
+    const { date, startTime, endTime, timeStartStr, timeEndStr, kindOfSpace, category, pricePerHour, durationHours, estimatedTotalPrice } = bookingData;
 
-    const [selectedDesk, setSelectedDesks] = useState([]);
+    const [selectedDesks, setSelectedDesks] = useState([]);
     const [bookedDesks, setBookedDesks] = useState([]);
-    const [loadingBooked, setLoadingBooked] = useState(false);
+    const [zoomScale, setZoomScale] = useState(1);
+    const [selectionError, setSelectionError] = useState('');
+
     const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [historyOrders, setHistoryOrders] = useState([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
 
+    // Fetch occupied / conflicting desks from backend
     useEffect(() => {
         let isMounted = true;
-        const fetchBookedDesks = async () => {
-            setLoadingBooked(true);
+        const fetchBooked = async () => {
             try {
-                const { ok, data } = await spacesApi.getBookedDesks(date, startTime, endTime);
-                if (isMounted && ok && data?.data && Array.isArray(data.data)) {
-                    setBookedDesks(data.data);
+                const { ok, data } = await spacesApi.getSpaces({
+                    date,
+                    startTime,
+                    endTime,
+                });
+                if (isMounted && ok && Array.isArray(data?.data)) {
+                    const unavailable = data.data
+                        .filter(s => s.status === 'UNAVAILABLE' || s.status === 'BOOKED')
+                        .map(s => s.code || s.deskNumber || s.nama);
+                    setBookedDesks(unavailable);
                 }
-            } catch (err) {
-                console.error('Failed to fetch booked desks:', err);
-            } finally {
-                if (isMounted) setLoadingBooked(false);
+            } catch {
+                // Non-critical fallback
             }
         };
-
-        if (date && startTime != null && endTime != null) {
-            fetchBookedDesks();
-        }
-
+        fetchBooked();
         return () => {
             isMounted = false;
         };
     }, [date, startTime, endTime]);
+
+    // Initial fetch of history
+    useEffect(() => {
+        const fetchInitialHistory = async () => {
+            try {
+                const { ok, data } = await ordersApi.getMyOrders();
+                if (ok && data?.data) {
+                    setHistoryOrders(data.data);
+                }
+            } catch {
+                // Non-critical
+            }
+        };
+        fetchInitialHistory();
+    }, []);
+
+    const toggleDeskSelection = (deskId) => {
+        setSelectionError('');
+        if (bookedDesks.includes(deskId)) {
+            setSelectionError(`Desk ${deskId} is already reserved for this time window.`);
+            return;
+        }
+
+        setSelectedDesks((prev) => {
+            if (prev.includes(deskId)) {
+                return prev.filter(id => id !== deskId);
+            }
+            // For single selection or multi: default allows 1 desk for simple checkout
+            return [deskId];
+        });
+    };
+
+    const handleNext = () => {
+        if (selectedDesks.length === 0) {
+            setSelectionError('Please choose a desk on the floorplan to proceed.');
+            return;
+        }
+
+        const calculatedTotalPrice = estimatedTotalPrice * (selectedDesks.length || 1);
+
+        navigate('/confirm', {
+            state: {
+                date,
+                startTime,
+                endTime,
+                timeStartStr,
+                timeEndStr,
+                kindOfSpace,
+                category,
+                selectedDesk: selectedDesks,
+                pricePerHour,
+                durationHours,
+                totalPrice: calculatedTotalPrice,
+            }
+        });
+    };
 
     const toggleHistoryModal = async () => {
         const willOpen = !showHistoryModal;
@@ -154,297 +199,301 @@ function MapVip() {
                 if (ok && data?.data) {
                     setHistoryOrders(data.data);
                 }
-            } catch (err) {
-                console.error('Failed to fetch orders history:', err);
+            } catch {
+                // Non-critical
             } finally {
                 setLoadingHistory(false);
             }
         }
     };
 
-    const toggleSelect = (deskId) => {
-        if (bookedDesks.includes(deskId)) {
-            return;
-        }
-
-        setSelectedDesks(prevSelectedDesks => {
-            return prevSelectedDesks.includes(deskId)
-                ? prevSelectedDesks.filter(id => id !== deskId)
-                : [...prevSelectedDesks, deskId];
-        });
-    };
-
-    const calculatedTotal = selectedDesk.length * (pricePerHour || 30000) * (durationHours || 2);
-
-    const handleNext = () => {
-        if (selectedDesk.length === 0) return;
-        navigate('/confirm', {
-            state: {
-                ...bookingState,
-                selectedDesk,
-                totalPrice: calculatedTotal,
-            }
-        });
-    };
-
     return (
-        <div className="map-page-layout">
-            <AppHeader 
-                currentStep={2} 
-                onOpenHistory={toggleHistoryModal} 
-                historyCount={historyOrders.length} 
+        <div className="min-h-screen w-full bg-[#0b0f17] text-slate-100 flex flex-col pb-28">
+            <AppHeader
+                currentStep={2}
+                onOpenHistory={toggleHistoryModal}
+                historyCount={historyOrders.length}
             />
 
-            <main className="map-main-wrapper">
-                {/* Header & Filter Context Bar */}
-                <div className="map-context-card">
-                    <div className="context-meta-group">
-                        <div className="context-item">
-                            <FaCalendarAlt className="meta-icon" />
-                            <span>{date}</span>
+            <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1">
+                {/* Context Bar */}
+                <Card className="mb-6 border-slate-800 bg-slate-900/80 p-4 sm:p-5 shadow-lg">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm font-medium text-slate-300">
+                            <div className="flex items-center gap-2">
+                                <Calendar className="h-4 w-4 text-[#feb600]" />
+                                <span className="font-semibold text-white">{date}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-[#feb600]" />
+                                <span className="font-semibold text-white">{timeStartStr} - {timeEndStr}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Layers className="h-4 w-4 text-[#feb600]" />
+                                <span className="font-semibold text-white">{kindOfSpace}</span>
+                                <Badge variant="amber" className="text-[10px] py-0 px-2 uppercase font-bold">
+                                    {category}
+                                </Badge>
+                            </div>
                         </div>
-                        <div className="context-item">
-                            <FaClock className="meta-icon" />
-                            <span>{timeStartStr} – {timeEndStr} ({durationHours} hrs)</span>
-                        </div>
-                        <div className="context-item">
-                            <FaLayerGroup className="meta-icon" />
-                            <span>{kindOfSpace}</span>
-                        </div>
-                        <div className="context-item">
-                            <FaCrown className="meta-icon text-amber" />
-                            <span className="tier-tag">{category}</span>
+
+                        {/* Legend */}
+                        <div className="flex flex-wrap items-center gap-3.5 text-xs text-slate-400">
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-sm bg-slate-800 border border-slate-700" />
+                                <span>Available</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-sm bg-[#feb600] shadow-[0_0_6px_rgba(254,182,0,0.6)]" />
+                                <span className="text-[#feb600] font-semibold">Selected</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-sm bg-slate-800 border border-dashed border-slate-600 opacity-60" />
+                                <span>Occupied</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                                <span className="h-2.5 w-2.5 rounded-sm border-2 border-[#feb600] bg-transparent" />
+                                <span>Matched</span>
+                            </div>
                         </div>
                     </div>
+                </Card>
 
-                    {/* Legend */}
-                    <div className="floorplan-legend">
-                        <div className="legend-chip">
-                            <span className="dot dot-avail" /> Available
-                        </div>
-                        <div className="legend-chip">
-                            <span className="dot dot-selected" /> Selected
-                        </div>
-                        <div className="legend-chip">
-                            <span className="dot dot-booked" /> Booked
-                        </div>
-                        <div className="legend-chip">
-                            <span className="dot dot-recommended" /> Recommended Tier
-                        </div>
-                    </div>
-                </div>
-
-                {loadingBooked && (
-                    <div className="loading-badge-row">
-                        <span className="btn-spinner" /> Checking real-time desk availability...
+                {selectionError && (
+                    <div className="mb-4 flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-xs sm:text-sm font-medium text-red-300">
+                        <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
+                        <span>{selectionError}</span>
                     </div>
                 )}
 
-                {/* Architectural Blueprint Viewport */}
-                <div className="blueprint-viewport-frame">
-                    <div className="blueprint-canvas">
-                        {/* Zone Markers */}
-                        <div className="zone-label-box" style={{ top: 22, left: 30 }}>
-                            QUIET FOCUS PODS (REGULER)
-                        </div>
-                        <div className="zone-label-box" style={{ top: 22, left: 540 }}>
-                            VIP PRIVATE PODS
-                        </div>
-                        <div className="zone-label-box" style={{ top: 175, left: 180 }}>
-                            TEAM COLLAB TABLE A
-                        </div>
-                        <div className="zone-label-box" style={{ top: 175, left: 560 }}>
-                            EXECUTIVE VIP CLUSTER
-                        </div>
-                        <div className="zone-label-box" style={{ top: 455, left: 180 }}>
-                            TEAM COLLAB TABLE B
-                        </div>
-                        <div className="zone-label-box" style={{ top: 455, left: 560 }}>
-                            VIP COLLAB SUITE
-                        </div>
-                        <div className="zone-label-box" style={{ top: 715, left: 110 }}>
-                            INDIVIDUAL STANDING / WINDOW DESKS
-                        </div>
-
-                        {/* Desks */}
-                        {desks.map((desk) => {
-                            const isBooked = bookedDesks.includes(desk.id);
-                            const isSelected = selectedDesk.includes(desk.id);
-                            const isMatching = desk.type === kindOfSpace && desk.category === category;
-
-                            let deskClasses = 'workstation-seat';
-                            if (isBooked) deskClasses += ' is-booked';
-                            else if (isSelected) deskClasses += ' is-selected';
-                            else if (isMatching) deskClasses += ' is-matching';
-
-                            return (
-                                <div
-                                    key={desk.id}
-                                    className={deskClasses}
-                                    onClick={() => toggleSelect(desk.id)}
-                                    title={
-                                        isBooked 
-                                            ? `Desk ${desk.id} is already booked for this time` 
-                                            : `Desk ${desk.id} (${desk.type} • ${desk.category}) - Click to select`
-                                    }
-                                    style={{
-                                        top: desk.top,
-                                        left: desk.left,
-                                        width: desk.vertical ? 32 : 72,
-                                        height: desk.vertical ? 72 : 32,
-                                    }}
-                                >
-                                    <span className="seat-code">{desk.id}</span>
-                                    {isSelected && <span className="seat-check">✓</span>}
-                                </div>
-                            );
-                        })}
-
-                        {/* Partition lines & doorways */}
-                        <div className="blueprint-wall" style={{ top: 145, left: 0, width: 440 }} />
-                        <div className="doorway-tag" style={{ top: 135, left: 445 }}>ENTRANCE / DOOR</div>
-                        <div className="blueprint-wall" style={{ top: 145, left: 560, width: 340 }} />
-
-                        <div className="blueprint-wall" style={{ top: 620, left: 380, width: 520 }} />
-                        <div className="blueprint-wall-vert" style={{ top: 620, left: 380, height: 160 }} />
-                        <div className="doorway-tag" style={{ top: 610, left: 330 }}>PANTRY DOOR</div>
-
-                        <img src={compas} alt="Compass" className="blueprint-compass" />
+                {/* Blueprint Viewport & Controls */}
+                <div className="relative rounded-2xl border border-slate-800 bg-slate-950/80 p-4 sm:p-6 shadow-2xl overflow-x-auto">
+                    {/* Zoom / Reset Tool Buttons */}
+                    <div className="absolute right-6 top-6 z-20 flex items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/90 p-1 backdrop-blur-md">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setZoomScale(z => Math.min(1.4, z + 0.1))}
+                            className="h-8 w-8 text-slate-300 hover:text-white"
+                            title="Zoom In"
+                        >
+                            <ZoomIn className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setZoomScale(z => Math.max(0.7, z - 0.1))}
+                            className="h-8 w-8 text-slate-300 hover:text-white"
+                            title="Zoom Out"
+                        >
+                            <ZoomOut className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setZoomScale(1)}
+                            className="h-8 w-8 text-slate-300 hover:text-white"
+                            title="Reset Zoom"
+                        >
+                            <RotateCcw className="h-4 w-4" />
+                        </Button>
                     </div>
-                </div>
 
-                <div className="mobile-scroll-hint">
-                    ↔ Drag horizontally to view full floorplan
+                    {/* Canvas Center Wrapper */}
+                    <div className="flex justify-center items-center py-6 min-w-[920px]">
+                        <div
+                            style={{
+                                transform: `scale(${zoomScale})`,
+                                transformOrigin: 'center center',
+                                transition: 'transform 0.2s ease-out',
+                            }}
+                            className="relative w-[900px] h-[800px] rounded-xl border border-slate-800/80 bg-[#090d16] shadow-inner select-none"
+                        >
+                            {/* Grid Texture Background */}
+                            <div 
+                                className="absolute inset-0 rounded-xl opacity-20 pointer-events-none"
+                                style={{
+                                    backgroundImage: 'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
+                                    backgroundSize: '24px 24px',
+                                }}
+                            />
+
+                            {/* Compass Rose */}
+                            <img
+                                src={compas}
+                                alt="Compass"
+                                className="absolute bottom-6 right-6 w-16 h-16 opacity-30 pointer-events-none select-none"
+                            />
+
+                            {/* Zone Label Banners */}
+                            <div className="absolute top-4 left-6 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                                Zone A • Quiet Individual Desks
+                            </div>
+                            <div className="absolute top-4 right-20 text-[10px] font-bold tracking-widest text-[#feb600]/60 uppercase">
+                                Zone B • VIP Premium Workstations
+                            </div>
+                            <div className="absolute top-[180px] left-6 text-[10px] font-bold tracking-widest text-slate-500 uppercase">
+                                Zone C • Team Collaboration Clusters
+                            </div>
+                            <div className="absolute top-[200px] right-20 text-[10px] font-bold tracking-widest text-[#feb600]/60 uppercase">
+                                Zone D • Private Conference Rooms
+                            </div>
+
+                            {/* Architectural Doors */}
+                            <div className="absolute bottom-0 left-[420px] px-3 py-1 bg-slate-800 text-[10px] font-bold text-slate-300 rounded-t-md border-t border-x border-slate-700">
+                                Main Entrance
+                            </div>
+                            <div className="absolute top-0 left-[420px] px-3 py-1 bg-slate-800 text-[10px] font-bold text-slate-300 rounded-b-md border-b border-x border-slate-700">
+                                Emergency Exit
+                            </div>
+
+                            {/* Render Desks */}
+                            {desks.map((d) => {
+                                const isSelected = selectedDesks.includes(d.id);
+                                const isBooked = bookedDesks.includes(d.id);
+                                const isRecommended = d.type === kindOfSpace && d.category === category;
+
+                                const isMeeting = d.type === 'Meeting Room';
+                                const width = isMeeting ? 140 : 64;
+                                const height = isMeeting ? 120 : 36;
+
+                                return (
+                                    <div
+                                        key={d.id}
+                                        onClick={() => toggleDeskSelection(d.id)}
+                                        style={{
+                                            position: 'absolute',
+                                            top: `${d.top}px`,
+                                            left: `${d.left}px`,
+                                            width: `${width}px`,
+                                            height: `${height}px`,
+                                        }}
+                                        className={`group rounded-lg flex items-center justify-center transition-all cursor-pointer font-bold text-xs select-none ${
+                                            isBooked
+                                                ? 'bg-slate-900 border border-dashed border-slate-700 text-slate-600 cursor-not-allowed opacity-50'
+                                                : isSelected
+                                                ? 'bg-[#feb600] text-[#0f172a] shadow-[0_0_16px_rgba(254,182,0,0.7)] scale-105 z-10 font-extrabold ring-2 ring-white/50'
+                                                : isRecommended
+                                                ? 'bg-slate-900/90 border-2 border-[#feb600]/80 text-[#feb600] hover:bg-[#feb600]/20 hover:scale-105 z-0 shadow-md shadow-[#feb600]/10'
+                                                : 'bg-slate-900/90 border border-slate-700 text-slate-300 hover:border-slate-500 hover:bg-slate-800 hover:text-white z-0'
+                                        }`}
+                                        title={`Desk ${d.id} (${d.type} - ${d.category})${isBooked ? ' [Reserved]' : ''}`}
+                                    >
+                                        <div className="flex flex-col items-center justify-center">
+                                            <span className={isSelected ? 'text-[#0f172a]' : ''}>{d.id}</span>
+                                            {isMeeting && (
+                                                <span className={`text-[9px] font-normal tracking-tight ${isSelected ? 'text-[#0f172a]' : 'text-slate-400'}`}>
+                                                    {d.category} Suite
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             </main>
 
-            {/* Floating Bottom Dock */}
-            <div className="map-bottom-dock">
-                <div className="dock-inner">
-                    <button
-                        type="button"
-                        className="dock-back-btn"
-                        onClick={() => navigate('/order')}
-                    >
-                        <FaArrowLeft className="dock-btn-icon" />
-                        <span>Back to Schedule</span>
-                    </button>
+            {/* Sticky Bottom Summary & Navigation Dock */}
+            <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-800 bg-slate-950/95 backdrop-blur-md px-4 py-3.5 shadow-2xl">
+                <div className="w-full max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="flex items-center gap-4 text-xs sm:text-sm">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate('/order')}
+                            className="gap-2 border-slate-700 text-slate-300 hover:text-white"
+                        >
+                            <ArrowLeft className="h-3.5 w-3.5" />
+                            <span>Change Schedule</span>
+                        </Button>
 
-                    <div className="dock-selection-summary">
-                        <div className="selected-tag-row">
-                            <span className="summary-title">Selected Desks:</span>
-                            {selectedDesk.length > 0 ? (
-                                <div className="selected-chips-wrap">
-                                    {selectedDesk.map(d => (
-                                        <span key={d} className="selected-chip-badge">{d}</span>
-                                    ))}
-                                </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-slate-400">Selected Station:</span>
+                            {selectedDesks.length > 0 ? (
+                                <Badge variant="amber" className="font-bold text-xs">
+                                    {selectedDesks.join(', ')}
+                                </Badge>
                             ) : (
-                                <span className="no-selection-hint">Please click available desk(s) above</span>
+                                <span className="text-slate-500 italic">None selected</span>
                             )}
                         </div>
-
-                        {selectedDesk.length > 0 && (
-                            <div className="dock-price-preview">
-                                Total: <strong className="dock-total-highlight">Rp {calculatedTotal.toLocaleString('id-ID')}</strong>
-                            </div>
-                        )}
                     </div>
 
-                    <button
-                        type="button"
-                        className="dock-next-btn"
-                        onClick={handleNext}
-                        disabled={selectedDesk.length === 0}
-                    >
-                        <span>Confirm Booking ({selectedDesk.length})</span>
-                        <FaArrowRight className="dock-btn-icon" />
-                    </button>
+                    <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                        <div className="text-right">
+                            <div className="text-[11px] text-slate-400 uppercase font-semibold">Total Price</div>
+                            <div className="text-lg sm:text-xl font-extrabold text-[#feb600]">
+                                Rp {((estimatedTotalPrice * (selectedDesks.length || 1))).toLocaleString('id-ID')}
+                            </div>
+                        </div>
+
+                        <Button
+                            type="button"
+                            onClick={handleNext}
+                            disabled={selectedDesks.length === 0}
+                            size="lg"
+                            className="gap-2 font-bold px-6 shadow-md shadow-[#feb600]/20"
+                        >
+                            <span>Proceed to Payment</span>
+                            <ArrowRight className="h-4 w-4" />
+                        </Button>
+                    </div>
                 </div>
             </div>
 
-            {/* Booking History Modal */}
-            {showHistoryModal && (
-                <div className="modal-backdrop-anim" onClick={toggleHistoryModal}>
-                    <div className="history-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="history-modal-header">
-                            <div className="history-header-title">
-                                <FaReceipt className="history-header-icon" />
-                                <h2>My Booking History</h2>
+            {/* History Modal using ShadCN Dialog */}
+            <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
+                <DialogContent className="max-w-xl max-h-[85vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Receipt className="h-5 w-5 text-[#feb600]" />
+                            <span>My Booking History</span>
+                        </DialogTitle>
+                        <DialogDescription>
+                            Review all your past and upcoming workspace reservations.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex-1 overflow-y-auto space-y-3 pr-1 my-2">
+                        {loadingHistory ? (
+                            <div className="text-center py-10 text-sm text-slate-400">
+                                Loading your reservations...
                             </div>
-                            <button
-                                type="button"
-                                className="modal-close-icon-btn"
-                                onClick={toggleHistoryModal}
-                                aria-label="Close modal"
-                            >
-                                <FaTimes />
-                            </button>
-                        </div>
-
-                        <div className="history-modal-body">
-                            {loadingHistory ? (
-                                <div className="history-loading-state">
-                                    <div className="btn-spinner" />
-                                    <span>Loading your reservations...</span>
-                                </div>
-                            ) : historyOrders.length === 0 ? (
-                                <div className="history-empty-state">
-                                    <FaReceipt className="empty-icon" />
-                                    <p>No reservations found yet.</p>
-                                    <span className="empty-sub">Your confirmed desk bookings will appear here.</span>
-                                </div>
-                            ) : (
-                                <div className="history-card-list">
-                                    {historyOrders.map((ord) => (
-                                        <div key={ord.orderId} className="history-order-card">
-                                            <div className="order-card-header">
-                                                <div className="order-id-badge">
-                                                    #{ord.orderId ? ord.orderId.substring(0, 8) : 'NONGKI'}
-                                                </div>
-                                                <span className="order-status-pill">
-                                                    <FaCheck className="pill-check" />
-                                                    {ord.status || 'CONFIRMED'}
-                                                </span>
-                                            </div>
-
-                                            <div className="order-card-body">
-                                                <div className="order-info-line">
-                                                    <strong>{ord.spaceType || 'Desk'}</strong> ({ord.category || 'Standard'}) &bull; Desks: <span className="highlight-desks">{ord.bookedDesks?.join(', ') || 'N/A'}</span>
-                                                </div>
-                                                <div className="order-meta-line">
-                                                    <span>{ord.date}</span>
-                                                    <span>&bull;</span>
-                                                    <span>{String(ord.startTime).padStart(2, '0')}:00 - {String(ord.endTime).padStart(2, '0')}:00</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="order-card-footer">
-                                                <span className="payment-method-tag">{ord.paymentMethod || 'QRIS'}</span>
-                                                <span className="order-total-price">
-                                                    Rp {(ord.totalPrice || 0).toLocaleString('id-ID')}
-                                                </span>
-                                            </div>
+                        ) : historyOrders.length === 0 ? (
+                            <div className="text-center py-10 text-sm text-slate-400">
+                                No previous reservations found.
+                            </div>
+                        ) : (
+                            historyOrders.map((ord, idx) => (
+                                <div key={ord.id || idx} className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                                    <div>
+                                        <div className="text-xs font-bold text-white flex items-center gap-2">
+                                            <span>Order #{ord.id}</span>
+                                            <Badge variant={ord.status === 'PAID' ? 'emerald' : 'secondary'} className="text-[10px]">
+                                                {ord.status || 'CONFIRMED'}
+                                            </Badge>
                                         </div>
-                                    ))}
+                                        <div className="text-xs text-slate-400 mt-1">
+                                            {ord.bookingDate || ord.date || todayStr} • {ord.startTime || '08:00'} - {ord.endTime || '10:00'}
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-sm font-bold text-slate-200">
+                                            Rp {(ord.totalPrice || ord.price || 0).toLocaleString('id-ID')}
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-
-                        <div className="history-modal-footer">
-                            <button
-                                type="button"
-                                className="history-close-btn"
-                                onClick={toggleHistoryModal}
-                            >
-                                Close History
-                            </button>
-                        </div>
+                            ))
+                        )}
                     </div>
-                </div>
-            )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
-
-export default MapVip;

@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import '../Styles/Register.css';
 import logo from '../assets/logo.png';
 import { authApi } from '../services/api';
-import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaShieldAlt } from 'react-icons/fa';
+import { Button } from '../Components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../Components/ui/card';
+import { Input } from '../Components/ui/input';
+import { Label } from '../Components/ui/label';
+import { User, Mail, Phone, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, AlertCircle, CheckCircle } from 'lucide-react';
 
-function Register() {
+export default function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -29,22 +32,15 @@ function Register() {
             setErrorMessage('Full name is required.');
             return;
         }
-        if (trimmedName.length < 5) {
-            setErrorMessage('Name must be at least 5 characters long.');
-            return;
-        }
 
         if (!trimmedEmail) {
             setErrorMessage('Email address is required.');
             return;
         }
+
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(trimmedEmail)) {
             setErrorMessage('Please enter a valid email address.');
-            return;
-        }
-        if (trimmedEmail.length < 5 || trimmedEmail.length > 50) {
-            setErrorMessage('Email must be between 5 and 50 characters.');
             return;
         }
 
@@ -52,182 +48,179 @@ function Register() {
             setErrorMessage('Phone number is required.');
             return;
         }
-        if (trimmedPhone.length < 10 || trimmedPhone.length > 15) {
-            setErrorMessage('Phone number must be between 10 and 15 digits.');
-            return;
-        }
 
-        if (!password) {
-            setErrorMessage('Password is required.');
-            return;
-        }
-        if (password.length < 8) {
-            setErrorMessage('Password must be at least 8 characters long.');
+        if (!password || password.length < 6) {
+            setErrorMessage('Password must be at least 6 characters long.');
             return;
         }
 
         setLoading(true);
 
-        const payload = {
-            name: trimmedName,
-            email: trimmedEmail,
-            phoneNumber: trimmedPhone,
-            password: password,
-        };
-
         try {
-            const { ok, status, data } = await authApi.register(payload);
+            const registerPayload = {
+                name: trimmedName,
+                email: trimmedEmail,
+                phoneNumber: trimmedPhone,
+                password,
+            };
 
-            if (ok && data?.success !== false) {
-                setSuccessMessage('Account created successfully! Redirecting to login...');
+            const response = await authApi.register(registerPayload);
+
+            if (response.ok && response.data) {
+                setSuccessMessage('Registration successful! Redirecting to login...');
                 setTimeout(() => {
                     navigate('/login');
-                }, 1200);
+                }, 1500);
             } else {
-                if (data?.data && typeof data.data === 'object') {
-                    const validationMsgs = Object.values(data.data).join(' ');
-                    setErrorMessage(validationMsgs || data.message || 'Validation error.');
-                } else if (data?.message) {
-                    setErrorMessage(data.message);
-                } else {
-                    setErrorMessage(`Registration failed (Status ${status}). Please try again.`);
-                }
+                const backendMsg = response.data?.message || 'Registration failed. Email might already be registered.';
+                setErrorMessage(backendMsg);
             }
-        } catch (err) {
-            console.error('Registration error:', err);
-            setErrorMessage('Unable to connect to the server. Please ensure the backend is running.');
+        } catch {
+            setErrorMessage('Failed to connect to authentication server. Please check your network.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="auth-page">
-            <div className="auth-ambient-glow" />
+        <div className="min-h-screen w-full bg-[#0b0f17] text-slate-100 flex items-center justify-center p-4 sm:p-6 relative overflow-hidden">
+            {/* Ambient Background Glows */}
+            <div className="absolute top-1/4 right-1/4 translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#feb600]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-1/4 left-1/4 -translate-x-1/2 translate-y-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="auth-card register-card">
-                <div className="auth-header">
-                    <Link to="/" className="auth-logo-link" title="Back to Nongki Home">
-                        <img src={logo} alt="Nongki Logo" className="auth-logo" />
-                    </Link>
-                    <h1 className="auth-title">Create Account</h1>
-                    <p className="auth-subtitle">Join Nongki to reserve coworking spaces and enjoy barista perks</p>
-                </div>
-
-                <form className="auth-form" onSubmit={handleSubmit} noValidate>
-                    {errorMessage && (
-                        <div className="auth-alert error-alert" role="alert">
-                            <span>{errorMessage}</span>
-                        </div>
-                    )}
-                    {successMessage && (
-                        <div className="auth-alert success-alert" role="status">
-                            <span>{successMessage}</span>
-                        </div>
-                    )}
-
-                    <div className="auth-field">
-                        <label htmlFor="name">Full Name</label>
-                        <div className="input-wrapper">
-                            <FaUser className="input-icon" />
-                            <input
-                                id="name"
-                                type="text"
-                                placeholder="Your full name (min 5 characters)"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                disabled={loading}
-                                autoFocus
-                            />
-                        </div>
-                    </div>
-
-                    <div className="auth-field">
-                        <label htmlFor="email">Email Address</label>
-                        <div className="input-wrapper">
-                            <FaEnvelope className="input-icon" />
-                            <input
-                                id="email"
-                                type="email"
-                                placeholder="you@domain.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={loading}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="auth-field">
-                        <label htmlFor="phoneNumber">Phone Number</label>
-                        <div className="input-wrapper">
-                            <FaPhone className="input-icon" />
-                            <input
-                                id="phoneNumber"
-                                type="tel"
-                                placeholder="08xxxxxxxxxx (10-15 digits)"
-                                maxLength={15}
-                                inputMode="numeric"
-                                value={phoneNumber}
-                                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                                disabled={loading}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="auth-field">
-                        <label htmlFor="password">Password</label>
-                        <div className="input-wrapper">
-                            <FaLock className="input-icon" />
-                            <input
-                                id="password"
-                                type={showPassword ? 'text' : 'password'}
-                                placeholder="Create password (min 8 characters)"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                disabled={loading}
-                            />
-                            <button
-                                type="button"
-                                className="toggle-password-btn"
-                                onClick={() => setShowPassword(!showPassword)}
-                                tabIndex="-1"
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                            >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" className="auth-submit-btn" disabled={loading}>
-                        {loading ? (
-                            <span className="btn-loading-content">
-                                <span className="btn-spinner" />
-                                Registering...
-                            </span>
-                        ) : (
-                            <span className="btn-text-content">
-                                Create Account
-                                <FaArrowRight className="btn-arrow" />
-                            </span>
-                        )}
-                    </button>
-                </form>
-
-                <div className="auth-footer">
-                    <p className="switch-auth-text">
-                        Already have an account?{' '}
-                        <Link to="/login" className="auth-link">
-                            Sign in
+            <Card className="w-full max-w-lg border-slate-800 bg-slate-900/90 shadow-2xl relative z-10 backdrop-blur-md">
+                <CardHeader className="text-center pb-6">
+                    <div className="flex justify-center mb-3">
+                        <Link to="/" title="Back to Home" className="transition-transform hover:scale-105">
+                            <img src={logo} alt="Nongki Logo" className="h-8 w-auto object-contain" />
                         </Link>
-                    </p>
-                    <div className="auth-security-badge">
-                        <FaShieldAlt className="shield-icon" />
-                        <span>Protected by Nongki Auth Guard</span>
                     </div>
-                </div>
-            </div>
+                    <CardTitle className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                        Create an Account
+                    </CardTitle>
+                    <CardDescription className="text-xs sm:text-sm text-slate-400">
+                        Join Nongki to reserve workspaces and earn community rewards
+                    </CardDescription>
+                </CardHeader>
+
+                <form onSubmit={handleSubmit}>
+                    <CardContent className="space-y-4">
+                        {errorMessage && (
+                            <div className="flex items-center gap-2.5 rounded-xl border border-red-500/30 bg-red-500/10 px-3.5 py-2.5 text-xs font-medium text-red-300">
+                                <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
+                                <span>{errorMessage}</span>
+                            </div>
+                        )}
+
+                        {successMessage && (
+                            <div className="flex items-center gap-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-2.5 text-xs font-medium text-emerald-300">
+                                <CheckCircle className="h-4 w-4 shrink-0 text-emerald-400" />
+                                <span>{successMessage}</span>
+                            </div>
+                        )}
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="name">Full Name</Label>
+                            <div className="relative">
+                                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                <Input
+                                    id="name"
+                                    type="text"
+                                    placeholder="e.g. Alex Pratama"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="pl-10"
+                                    required
+                                    autoComplete="name"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="email">Email Address</Label>
+                            <div className="relative">
+                                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="alex@domain.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="pl-10"
+                                    required
+                                    autoComplete="email"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <div className="relative">
+                                <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    placeholder="08123456789"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    className="pl-10"
+                                    required
+                                    autoComplete="tel"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <Label htmlFor="password">Password (min 6 characters)</Label>
+                            <div className="relative">
+                                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                                <Input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="Create a strong password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="pl-10 pr-10"
+                                    required
+                                    autoComplete="new-password"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                </button>
+                            </div>
+                        </div>
+                    </CardContent>
+
+                    <CardFooter className="flex flex-col gap-4 pt-2">
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            size="lg"
+                            className="w-full font-bold gap-2 shadow-lg shadow-[#feb600]/20"
+                        >
+                            <span>{loading ? 'Registering Account...' : 'Create Account'}</span>
+                            <ArrowRight className="h-4 w-4" />
+                        </Button>
+
+                        <div className="text-center text-xs text-slate-400">
+                            Already have an account?{' '}
+                            <Link to="/login" className="font-semibold text-[#feb600] hover:underline">
+                                Sign in here
+                            </Link>
+                        </div>
+
+                        <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 mt-2">
+                            <ShieldCheck className="h-3.5 w-3.5 text-slate-600" />
+                            <span>Safe and confidential member data</span>
+                        </div>
+                    </CardFooter>
+                </form>
+            </Card>
         </div>
     );
 }
-
-export default Register;

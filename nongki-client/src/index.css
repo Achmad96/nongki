@@ -1,3 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-yellow: #feb600;
+  --color-brand-dark: #0b0f17;
+  --color-brand-surface: #0f172a;
+  --color-brand-card: #111827;
+  --color-brand-border: #1f2937;
+  --color-brand-muted: #94a3b8;
+}
+
 * {
   box-sizing: border-box;
 }

@@ -1,26 +1,41 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../Styles/Order.css';
 import AppHeader from '../Components/AppHeader';
 import { spacesApi, ordersApi } from '../services/api';
-import { 
-    FaCalendarAlt, 
-    FaClock, 
-    FaDesktop, 
-    FaUsers, 
-    FaDoorClosed, 
-    FaCrown, 
-    FaCheck, 
-    FaWifi, 
-    FaCoffee, 
-    FaBolt, 
-    FaSnowflake, 
-    FaArrowRight, 
-    FaTimes,
-    FaReceipt
-} from 'react-icons/fa';
+import { Button } from '../Components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../Components/ui/card';
+import { Badge } from '../Components/ui/badge';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '../Components/ui/dialog';
+import {
+    Calendar,
+    Clock,
+    Monitor,
+    Users,
+    DoorClosed,
+    Sparkles,
+    Wifi,
+    Coffee,
+    Zap,
+    Wind,
+    ArrowRight,
+    Check,
+    Receipt,
+    AlertCircle,
+} from 'lucide-react';
 
-function Order() {
+const timeOptions = [
+    '08:00', '09:00', '10:00', '11:00', '12:00',
+    '13:00', '14:00', '15:00', '16:00', '17:00',
+    '18:00', '19:00', '20:00', '21:00', '22:00'
+];
+
+export default function Order() {
     const navigate = useNavigate();
     const todayStr = new Date().toISOString().split('T')[0];
     const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -56,7 +71,7 @@ function Order() {
         };
     }, []);
 
-    // Initial fetch of history orders count
+    // Initial fetch of history count
     useEffect(() => {
         const fetchInitialHistory = async () => {
             try {
@@ -107,8 +122,8 @@ function Order() {
                 if (ok && data?.data) {
                     setHistoryOrders(data.data);
                 }
-            } catch (err) {
-                console.error('Failed to fetch orders history:', err);
+            } catch {
+                // Non-critical
             } finally {
                 setLoadingHistory(false);
             }
@@ -122,7 +137,7 @@ function Order() {
             return;
         }
         if (startHour >= endHour) {
-            setErrorMessage('End time must be later than start time.');
+            setErrorMessage('Time End must be later than Time Start.');
             return;
         }
 
@@ -142,371 +157,422 @@ function Order() {
         });
     };
 
-    const spaceTypes = [
+    const spaceOptions = [
         {
             id: 'Desk',
             title: 'Individual Desk',
-            desc: 'Quiet zone workstation with ergonomic chair & power outlet',
-            icon: FaDesktop,
+            description: 'Quiet zone workstation with ergonomic chair & power outlet',
+            icon: Monitor,
+            regulerPrice: 'Rp 15.000',
+            vipPrice: 'Rp 30.000',
         },
         {
             id: 'Group Desk',
             title: 'Group Desk',
-            desc: 'Collaborative cluster designed for team productivity',
-            icon: FaUsers,
+            description: 'Collaborative cluster designed for team productivity',
+            icon: Users,
+            regulerPrice: 'Rp 45.000',
+            vipPrice: 'Rp 80.000',
         },
         {
             id: 'Meeting Room',
-            title: 'Meeting Room',
-            desc: 'Private sound-insulated room with presentation display',
-            icon: FaDoorClosed,
+            title: 'Private Meeting Room',
+            description: 'Sound-insulated room with whiteboard & presentation display',
+            icon: DoorClosed,
+            regulerPrice: 'Rp 100.000',
+            vipPrice: 'Rp 180.000',
         },
     ];
 
-    const perks = resolvedCategory === 'VIP' ? [
-        { icon: FaWifi, label: 'High-Speed WiFi (100 Mbps)' },
-        { icon: FaCoffee, label: 'Free Flow Artisan Coffee & Tea' },
-        { icon: FaSnowflake, label: 'Full Air Conditioning' },
-        { icon: FaBolt, label: 'Dedicated Power & Fast Charging' },
-        { icon: FaCrown, label: 'VIP Lounge & Projector Access' },
-    ] : [
-        { icon: FaWifi, label: 'High-Speed WiFi (50 Mbps)' },
-        { icon: FaSnowflake, label: 'Full Air Conditioning' },
-        { icon: FaBolt, label: 'Dedicated Power Outlets' },
-    ];
-
     return (
-        <div className="order-layout">
-            <AppHeader 
-                currentStep={1} 
-                onOpenHistory={toggleHistoryModal} 
-                historyCount={historyOrders.length} 
+        <div className="min-h-screen w-full bg-[#0b0f17] text-slate-100 flex flex-col">
+            <AppHeader
+                currentStep={1}
+                onOpenHistory={toggleHistoryModal}
+                historyCount={historyOrders.length}
             />
 
-            <main className="order-main-container">
-                <div className="order-page-header">
-                    <div>
-                        <h1 className="page-heading">Book Your Workspace</h1>
-                        <p className="page-subheading">Customize your date, duration, and ideal workstation tier</p>
-                    </div>
+            <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 flex-1">
+                {/* Page Heading */}
+                <div className="mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+                        Book Your Workspace
+                    </h1>
+                    <p className="text-sm sm:text-base text-slate-400 mt-1">
+                        Customize your date, duration, and ideal workstation tier
+                    </p>
                 </div>
 
                 {errorMessage && (
-                    <div className="order-alert-error" role="alert">
+                    <div className="mb-6 flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
+                        <AlertCircle className="h-5 w-5 shrink-0 text-red-400" />
                         <span>{errorMessage}</span>
                     </div>
                 )}
 
-                <div className="order-grid">
-                    {/* Left Column: Form Builder */}
-                    <div className="order-builder-col">
-                        {/* Section 1: Schedule */}
-                        <section className="builder-card">
-                            <div className="card-section-header">
-                                <span className="section-number">1</span>
-                                <div>
-                                    <h2 className="section-title">Date & Schedule</h2>
-                                    <p className="section-subtitle">Pick your reservation date and duration</p>
+                {/* Main 2-Column Responsive Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Left Column: Form Controls */}
+                    <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
+                        {/* Section 1: Date & Schedule */}
+                        <Card className="border-slate-800/80 bg-slate-900/70">
+                            <CardHeader className="pb-4 border-b border-slate-800/60">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#feb600] text-xs font-bold text-[#0f172a]">
+                                        1
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-base sm:text-lg">Date & Schedule</CardTitle>
+                                        <CardDescription className="text-xs sm:text-sm">Pick your reservation date and duration</CardDescription>
+                                    </div>
                                 </div>
-                            </div>
+                            </CardHeader>
 
-                            <div className="form-group">
-                                <label className="form-label" htmlFor="order-date">
-                                    <FaCalendarAlt className="label-icon" /> Reservation Date
-                                </label>
-                                <div className="date-input-row">
-                                    <input
-                                        type="date"
-                                        id="order-date"
-                                        className="styled-input date-input"
-                                        value={date}
-                                        min={todayStr}
-                                        onChange={(e) => setDate(e.target.value)}
-                                    />
-                                    <div className="quick-date-pills">
+                            <CardContent className="pt-6 flex flex-col gap-5">
+                                {/* Date Input + Quick Presets */}
+                                <div>
+                                    <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider mb-2">
+                                        <Calendar className="h-3.5 w-3.5 text-[#feb600]" />
+                                        Reservation Date
+                                    </label>
+                                    <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                                        <input
+                                            type="date"
+                                            value={date}
+                                            min={todayStr}
+                                            onChange={(e) => setDate(e.target.value)}
+                                            className="h-11 flex-1 rounded-xl border border-slate-700/80 bg-slate-950/70 px-4 text-sm text-slate-100 transition-colors focus:outline-none focus:border-[#feb600] focus:ring-1 focus:ring-[#feb600]"
+                                        />
+                                        <div className="flex gap-2">
+                                            <Button
+                                                type="button"
+                                                variant={date === todayStr ? 'default' : 'secondary'}
+                                                size="sm"
+                                                onClick={() => setDate(todayStr)}
+                                                className="text-xs h-11 px-4"
+                                            >
+                                                Today
+                                            </Button>
+                                            <Button
+                                                type="button"
+                                                variant={date === tomorrowStr ? 'default' : 'secondary'}
+                                                size="sm"
+                                                onClick={() => setDate(tomorrowStr)}
+                                                className="text-xs h-11 px-4"
+                                            >
+                                                Tomorrow
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Time Window */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                                    <div>
+                                        <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider mb-2">
+                                            <Clock className="h-3.5 w-3.5 text-[#feb600]" />
+                                            Start Time
+                                        </label>
+                                        <select
+                                            value={timeStart}
+                                            onChange={(e) => setTimeStart(e.target.value)}
+                                            className="h-11 w-full rounded-xl border border-slate-700/80 bg-slate-950/70 px-4 text-sm text-slate-100 transition-colors focus:outline-none focus:border-[#feb600] focus:ring-1 focus:ring-[#feb600]"
+                                        >
+                                            {timeOptions.slice(0, -1).map((t) => (
+                                                <option key={t} value={t} className="bg-slate-900 text-white">
+                                                    {t}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider">
+                                                <Clock className="h-3.5 w-3.5 text-[#feb600]" />
+                                                End Time
+                                            </label>
+                                            <Badge variant="amber" className="text-[11px] py-0 px-2 font-bold">
+                                                {durationHours} {durationHours === 1 ? 'hour' : 'hours'}
+                                            </Badge>
+                                        </div>
+                                        <select
+                                            value={timeEnd}
+                                            onChange={(e) => setTimeEnd(e.target.value)}
+                                            className="h-11 w-full rounded-xl border border-slate-700/80 bg-slate-950/70 px-4 text-sm text-slate-100 transition-colors focus:outline-none focus:border-[#feb600] focus:ring-1 focus:ring-[#feb600]"
+                                        >
+                                            {timeOptions.filter(t => parseInt(t.split(':')[0], 10) > startHour).map((t) => (
+                                                <option key={t} value={t} className="bg-slate-900 text-white">
+                                                    {t}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Section 2: Space Type & Tier */}
+                        <Card className="border-slate-800/80 bg-slate-900/70">
+                            <CardHeader className="pb-4 border-b border-slate-800/60">
+                                <div className="flex items-center gap-3">
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#feb600] text-xs font-bold text-[#0f172a]">
+                                        2
+                                    </div>
+                                    <div>
+                                        <CardTitle className="text-base sm:text-lg">Space Type & Tier</CardTitle>
+                                        <CardDescription className="text-xs sm:text-sm">Choose the workstation style that matches your workflow</CardDescription>
+                                    </div>
+                                </div>
+                            </CardHeader>
+
+                            <CardContent className="pt-6 flex flex-col gap-4">
+                                {/* Space Type Cards */}
+                                <div className="grid grid-cols-1 gap-3">
+                                    {spaceOptions.map((opt) => {
+                                        const Icon = opt.icon;
+                                        const isSelected = kindOfSpace === opt.id;
+                                        return (
+                                            <div
+                                                key={opt.id}
+                                                onClick={() => setKindOfSpace(opt.id)}
+                                                className={`group flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+                                                    isSelected
+                                                        ? 'border-[#feb600] bg-slate-950/90 shadow-[0_0_15px_rgba(254,182,0,0.1)] ring-1 ring-[#feb600]'
+                                                        : 'border-slate-800 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-950/60'
+                                                }`}
+                                            >
+                                                <div className="flex items-center gap-3.5">
+                                                    <div className={`flex h-11 w-11 items-center justify-center rounded-xl transition-colors ${
+                                                        isSelected ? 'bg-[#feb600] text-[#0f172a]' : 'bg-slate-800 text-slate-300 group-hover:text-white'
+                                                    }`}>
+                                                        <Icon className="h-5 w-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                                                            {opt.title}
+                                                            {isSelected && (
+                                                                <span className="flex h-2 w-2 rounded-full bg-[#feb600] animate-pulse" />
+                                                            )}
+                                                        </h4>
+                                                        <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
+                                                            {opt.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-4">
+                                                    <div className="text-right hidden sm:block">
+                                                        <div className="text-xs text-slate-400">From</div>
+                                                        <div className="text-sm font-bold text-slate-200">
+                                                            {resolvedCategory === 'VIP' ? opt.vipPrice : opt.regulerPrice}
+                                                            <span className="text-[10px] text-slate-400 font-normal">/hr</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className={`flex h-5 w-5 items-center justify-center rounded-full border transition-all ${
+                                                        isSelected
+                                                            ? 'border-[#feb600] bg-[#feb600]'
+                                                            : 'border-slate-600 bg-transparent'
+                                                    }`}>
+                                                        {isSelected && <div className="h-2 w-2 rounded-full bg-[#0f172a]" />}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+
+                                {/* Tier Selection Switch */}
+                                <div className="mt-2 pt-4 border-t border-slate-800/80">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                                            Tier Selection
+                                        </label>
+                                        <Badge variant={resolvedCategory === 'VIP' ? 'amber' : 'secondary'} className="text-[11px]">
+                                            {resolvedCategory === 'VIP' ? 'VIP Privileges Included' : 'Standard Workspace'}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
                                         <button
                                             type="button"
-                                            className={`quick-pill ${date === todayStr ? 'active' : ''}`}
-                                            onClick={() => setDate(todayStr)}
+                                            onClick={() => setCategory('Reguler')}
+                                            className={`p-3.5 rounded-xl border text-left transition-all ${
+                                                resolvedCategory === 'Reguler'
+                                                    ? 'border-[#feb600] bg-slate-950/80 ring-1 ring-[#feb600]'
+                                                    : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
+                                            }`}
                                         >
-                                            Today
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold text-white">Reguler</span>
+                                                {resolvedCategory === 'Reguler' && <Check className="h-4 w-4 text-[#feb600]" />}
+                                            </div>
+                                            <p className="text-xs text-slate-400 mt-1">High-speed WiFi & full AC</p>
                                         </button>
+
                                         <button
                                             type="button"
-                                            className={`quick-pill ${date === tomorrowStr ? 'active' : ''}`}
-                                            onClick={() => setDate(tomorrowStr)}
+                                            onClick={() => setCategory('VIP')}
+                                            className={`p-3.5 rounded-xl border text-left transition-all ${
+                                                resolvedCategory === 'VIP'
+                                                    ? 'border-[#feb600] bg-slate-950/80 ring-1 ring-[#feb600]'
+                                                    : 'border-slate-800 bg-slate-950/40 hover:border-slate-700'
+                                            }`}
                                         >
-                                            Tomorrow
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-sm font-bold text-[#feb600] flex items-center gap-1.5">
+                                                    <Sparkles className="h-3.5 w-3.5" /> VIP Experience
+                                                </span>
+                                                {resolvedCategory === 'VIP' && <Check className="h-4 w-4 text-[#feb600]" />}
+                                            </div>
+                                            <p className="text-xs text-slate-400 mt-1">Free-flow artisan coffee & tea + VIP lounge</p>
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="time-select-grid">
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="time-start">
-                                        <FaClock className="label-icon" /> Start Time
-                                    </label>
-                                    <select
-                                        id="time-start"
-                                        className="styled-select"
-                                        value={timeStart}
-                                        onChange={(e) => setTimeStart(e.target.value)}
-                                    >
-                                        <option value="08:00">08:00 AM</option>
-                                        <option value="09:00">09:00 AM</option>
-                                        <option value="10:00">10:00 AM</option>
-                                        <option value="11:00">11:00 AM</option>
-                                        <option value="12:00">12:00 PM</option>
-                                        <option value="13:00">01:00 PM</option>
-                                        <option value="14:00">02:00 PM</option>
-                                        <option value="15:00">03:00 PM</option>
-                                    </select>
-                                </div>
-
-                                <div className="duration-indicator">
-                                    <span className="duration-arrow">→</span>
-                                    <span className="duration-text">{durationHours} hr{durationHours > 1 ? 's' : ''}</span>
-                                </div>
-
-                                <div className="form-group">
-                                    <label className="form-label" htmlFor="time-end">
-                                        <FaClock className="label-icon" /> End Time
-                                    </label>
-                                    <select
-                                        id="time-end"
-                                        className="styled-select"
-                                        value={timeEnd}
-                                        onChange={(e) => setTimeEnd(e.target.value)}
-                                    >
-                                        <option value="09:00">09:00 AM</option>
-                                        <option value="10:00">10:00 AM</option>
-                                        <option value="11:00">11:00 AM</option>
-                                        <option value="12:00">12:00 PM</option>
-                                        <option value="13:00">01:00 PM</option>
-                                        <option value="14:00">02:00 PM</option>
-                                        <option value="15:00">03:00 PM</option>
-                                        <option value="16:00">04:00 PM</option>
-                                        <option value="17:00">05:00 PM</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Section 2: Space Type */}
-                        <section className="builder-card">
-                            <div className="card-section-header">
-                                <span className="section-number">2</span>
-                                <div>
-                                    <h2 className="section-title">Space Type & Tier</h2>
-                                    <p className="section-subtitle">Choose the workstation style that matches your workflow</p>
-                                </div>
-                            </div>
-
-                            {/* Space Cards */}
-                            <div className="space-type-cards">
-                                {spaceTypes.map((type) => {
-                                    const Icon = type.icon;
-                                    const isSelected = kindOfSpace === type.id;
-                                    return (
-                                        <div
-                                            key={type.id}
-                                            className={`space-type-card ${isSelected ? 'selected' : ''}`}
-                                            onClick={() => setKindOfSpace(type.id)}
-                                            role="button"
-                                            tabIndex="0"
-                                            onKeyDown={(e) => { if (e.key === 'Enter') setKindOfSpace(type.id); }}
-                                        >
-                                            <div className="space-card-icon-wrap">
-                                                <Icon className="space-card-icon" />
-                                            </div>
-                                            <div className="space-card-content">
-                                                <div className="space-card-title">{type.title}</div>
-                                                <div className="space-card-desc">{type.desc}</div>
-                                            </div>
-                                            <div className="space-card-radio">
-                                                <div className="radio-inner" />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            {/* Tier Selector: VIP vs Reguler */}
-                            <div className="tier-selector-container">
-                                <label className="form-label">Service Tier</label>
-                                <div className="tier-switch">
-                                    <button
-                                        type="button"
-                                        className={`tier-btn ${resolvedCategory === 'VIP' ? 'active vip-active' : ''}`}
-                                        onClick={() => setCategory('VIP')}
-                                    >
-                                        <FaCrown className="tier-icon" />
-                                        <span>VIP Experience</span>
-                                        <span className="tier-badge">Recommended</span>
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className={`tier-btn ${resolvedCategory === 'Reguler' ? 'active' : ''}`}
-                                        onClick={() => setCategory('Reguler')}
-                                    >
-                                        <span>Reguler Tier</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </section>
+                            </CardContent>
+                        </Card>
                     </div>
 
-                    {/* Right Column: Live Summary & Amenities */}
-                    <aside className="order-summary-col">
-                        <div className="summary-sticky-card">
-                            <h3 className="summary-card-title">Booking Summary</h3>
-
-                            <div className="summary-detail-list">
-                                <div className="summary-row">
-                                    <span className="summary-label">Space Type</span>
-                                    <span className="summary-val">{kindOfSpace}</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span className="summary-label">Tier</span>
-                                    <span className={`summary-badge ${resolvedCategory === 'VIP' ? 'badge-vip' : 'badge-reg'}`}>
+                    {/* Right Column: Sticky Booking Summary */}
+                    <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24">
+                        <Card className="border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl">
+                            <CardHeader className="pb-4 border-b border-slate-800/80">
+                                <CardTitle className="text-lg font-bold text-white flex items-center justify-between">
+                                    <span>Booking Summary</span>
+                                    <Badge variant="amber" className="text-xs font-bold">
                                         {resolvedCategory}
-                                    </span>
-                                </div>
-                                <div className="summary-row">
-                                    <span className="summary-label">Date</span>
-                                    <span className="summary-val">{date}</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span className="summary-label">Time Window</span>
-                                    <span className="summary-val">{timeStart} - {timeEnd} ({durationHours} hrs)</span>
-                                </div>
-                                <div className="summary-row">
-                                    <span className="summary-label">Rate / Hour</span>
-                                    <span className="summary-val">Rp {pricePerHour.toLocaleString('id-ID')}</span>
-                                </div>
-                            </div>
+                                    </Badge>
+                                </CardTitle>
+                            </CardHeader>
 
-                            <div className="summary-divider" />
-
-                            <div className="summary-total-row">
-                                <div className="total-label">Estimated Total</div>
-                                <div className="total-amount">
-                                    Rp {estimatedTotalPrice.toLocaleString('id-ID')}
+                            <CardContent className="pt-5 flex flex-col gap-4 text-sm">
+                                <div className="flex justify-between items-center text-slate-300">
+                                    <span className="text-slate-400">Space Type</span>
+                                    <span className="font-semibold text-white">{kindOfSpace}</span>
                                 </div>
-                            </div>
 
-                            <button
-                                type="button"
-                                className="proceed-cta-btn"
-                                onClick={handleCheck}
-                            >
-                                <span>Choose Desks on Floorplan</span>
-                                <FaArrowRight className="cta-icon" />
-                            </button>
+                                <div className="flex justify-between items-center text-slate-300">
+                                    <span className="text-slate-400">Reservation Date</span>
+                                    <span className="font-semibold text-white">{date}</span>
+                                </div>
 
-                            {/* Included Amenities List */}
-                            <div className="included-perks-box">
-                                <div className="perks-title">Included Amenities</div>
-                                <ul className="perks-list">
-                                    {perks.map((p, i) => {
-                                        const PerkIcon = p.icon;
-                                        return (
-                                            <li key={i} className="perk-item">
-                                                <PerkIcon className="perk-icon" />
-                                                <span>{p.label}</span>
+                                <div className="flex justify-between items-center text-slate-300">
+                                    <span className="text-slate-400">Time Window</span>
+                                    <span className="font-semibold text-white">{timeStart} - {timeEnd} ({durationHours} hrs)</span>
+                                </div>
+
+                                <div className="flex justify-between items-center text-slate-300">
+                                    <span className="text-slate-400">Rate / Hour</span>
+                                    <span className="font-semibold text-white">Rp {pricePerHour.toLocaleString('id-ID')}</span>
+                                </div>
+
+                                <div className="my-2 border-t border-dashed border-slate-800" />
+
+                                <div className="flex justify-between items-baseline">
+                                    <div>
+                                        <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Estimated Total</div>
+                                        <div className="text-[11px] text-slate-500">Includes all perks & tax</div>
+                                    </div>
+                                    <div className="text-2xl font-extrabold text-[#feb600]">
+                                        Rp {estimatedTotalPrice.toLocaleString('id-ID')}
+                                    </div>
+                                </div>
+
+                                <Button
+                                    type="button"
+                                    onClick={handleCheck}
+                                    size="lg"
+                                    className="w-full mt-3 h-12 text-sm font-bold gap-2 shadow-lg shadow-[#feb600]/20"
+                                >
+                                    <span>Choose Desks on Floorplan</span>
+                                    <ArrowRight className="h-4 w-4" />
+                                </Button>
+
+                                {/* Included Amenities */}
+                                <div className="mt-4 pt-4 border-t border-slate-800/80">
+                                    <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">
+                                        Included Amenities
+                                    </h5>
+                                    <ul className="space-y-2 text-xs text-slate-300">
+                                        <li className="flex items-center gap-2">
+                                            <Wifi className="h-3.5 w-3.5 text-[#feb600]" />
+                                            <span>High-Speed WiFi ({resolvedCategory === 'VIP' ? '100 Mbps' : '50 Mbps'})</span>
+                                        </li>
+                                        {resolvedCategory === 'VIP' && (
+                                            <li className="flex items-center gap-2">
+                                                <Coffee className="h-3.5 w-3.5 text-[#feb600]" />
+                                                <span>Free Flow Artisan Coffee & Tea</span>
                                             </li>
-                                        );
-                                    })}
-                                </ul>
-                            </div>
-                        </div>
-                    </aside>
+                                        )}
+                                        <li className="flex items-center gap-2">
+                                            <Wind className="h-3.5 w-3.5 text-[#feb600]" />
+                                            <span>Full Air Conditioning Comfort</span>
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <Zap className="h-3.5 w-3.5 text-[#feb600]" />
+                                            <span>Dedicated Power Outlet at Each Station</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
             </main>
 
-            {/* Booking History Drawer / Modal */}
-            {showHistoryModal && (
-                <div className="modal-backdrop-anim" onClick={toggleHistoryModal}>
-                    <div className="history-modal-box" onClick={(e) => e.stopPropagation()}>
-                        <div className="history-modal-header">
-                            <div className="history-header-title">
-                                <FaReceipt className="history-header-icon" />
-                                <h2>My Booking History</h2>
+            {/* History Modal using ShadCN Dialog */}
+            <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
+                <DialogContent className="max-w-xl max-h-[85vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Receipt className="h-5 w-5 text-[#feb600]" />
+                            <span>My Booking History</span>
+                        </DialogTitle>
+                        <DialogDescription>
+                            Review all your past and upcoming workspace reservations.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="flex-1 overflow-y-auto space-y-3 pr-1 my-2">
+                        {loadingHistory ? (
+                            <div className="text-center py-10 text-sm text-slate-400">
+                                Loading your reservations...
                             </div>
-                            <button
-                                type="button"
-                                className="modal-close-icon-btn"
-                                onClick={toggleHistoryModal}
-                                aria-label="Close modal"
-                            >
-                                <FaTimes />
-                            </button>
-                        </div>
-
-                        <div className="history-modal-body">
-                            {loadingHistory ? (
-                                <div className="history-loading-state">
-                                    <div className="btn-spinner" />
-                                    <span>Loading your reservations...</span>
-                                </div>
-                            ) : historyOrders.length === 0 ? (
-                                <div className="history-empty-state">
-                                    <FaReceipt className="empty-icon" />
-                                    <p>No reservations found yet.</p>
-                                    <span className="empty-sub">Your confirmed desk bookings will appear here.</span>
-                                </div>
-                            ) : (
-                                <div className="history-card-list">
-                                    {historyOrders.map((ord) => (
-                                        <div key={ord.orderId} className="history-order-card">
-                                            <div className="order-card-header">
-                                                <div className="order-id-badge">
-                                                    #{ord.orderId ? ord.orderId.substring(0, 8) : 'NONGKI'}
-                                                </div>
-                                                <span className="order-status-pill">
-                                                    <FaCheck className="pill-check" />
-                                                    {ord.status || 'CONFIRMED'}
-                                                </span>
-                                            </div>
-
-                                            <div className="order-card-body">
-                                                <div className="order-info-line">
-                                                    <strong>{ord.spaceType || 'Desk'}</strong> ({ord.category || 'Standard'}) &bull; Desks: <span className="highlight-desks">{ord.bookedDesks?.join(', ') || 'N/A'}</span>
-                                                </div>
-                                                <div className="order-meta-line">
-                                                    <span>{ord.date}</span>
-                                                    <span>&bull;</span>
-                                                    <span>{String(ord.startTime).padStart(2, '0')}:00 - {String(ord.endTime).padStart(2, '0')}:00</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="order-card-footer">
-                                                <span className="payment-method-tag">{ord.paymentMethod || 'QRIS'}</span>
-                                                <span className="order-total-price">
-                                                    Rp {(ord.totalPrice || 0).toLocaleString('id-ID')}
-                                                </span>
-                                            </div>
+                        ) : historyOrders.length === 0 ? (
+                            <div className="text-center py-10 text-sm text-slate-400">
+                                No previous reservations found.
+                            </div>
+                        ) : (
+                            historyOrders.map((ord, idx) => (
+                                <div key={ord.id || idx} className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/60 flex items-center justify-between">
+                                    <div>
+                                        <div className="text-xs font-bold text-white flex items-center gap-2">
+                                            <span>Order #{ord.id}</span>
+                                            <Badge variant={ord.status === 'PAID' ? 'emerald' : 'secondary'} className="text-[10px]">
+                                                {ord.status || 'CONFIRMED'}
+                                            </Badge>
                                         </div>
-                                    ))}
+                                        <div className="text-xs text-slate-400 mt-1">
+                                            {ord.bookingDate || ord.date || todayStr} • {ord.startTime || '08:00'} - {ord.endTime || '10:00'}
+                                        </div>
+                                        {ord.orderDetail?.spaceDetail?.deskNumber && (
+                                            <div className="text-[11px] text-[#feb600] mt-0.5">
+                                                Desk: {ord.orderDetail.spaceDetail.deskNumber}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-sm font-bold text-slate-200">
+                                            Rp {(ord.totalPrice || ord.price || 0).toLocaleString('id-ID')}
+                                        </div>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-
-                        <div className="history-modal-footer">
-                            <button
-                                type="button"
-                                className="history-close-btn"
-                                onClick={toggleHistoryModal}
-                            >
-                                Close History
-                            </button>
-                        </div>
+                            ))
+                        )}
                     </div>
-                </div>
-            )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
-
-export default Order;
