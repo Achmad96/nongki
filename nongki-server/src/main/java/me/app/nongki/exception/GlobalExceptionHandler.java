@@ -14,47 +14,32 @@ import static me.app.nongki.util.ResponseUtil.response;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-  /**
-   * Handles ResourceNotFoundException and returns a 404 Not Found response.
-   *
-   * @param exception the exception to handle
-   * @return a ResponseEntity with a 404 status and the exception message
-   */
+
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException exception) {
-    return ResponseEntity.status(404).body(response(false, exception.getMessage(), null));
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response(false, exception.getMessage(), null));
   }
 
-  /**
-   * Handles AuthRejectedException and returns a 401 Unauthorized status.
-   *
-   * @param exception the exception to handle
-   * @return a ResponseEntity with a 401 Unauthorized status and the exception message
-   */
+  @ExceptionHandler(BookingConflictException.class)
+  public ResponseEntity<?> handleBookingConflictException(BookingConflictException exception) {
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response(false, exception.getMessage(), null));
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<?> handleIllegalArgumentException(IllegalArgumentException exception) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response(false, exception.getMessage(), null));
+  }
+
   @ExceptionHandler(AuthRejectedException.class)
   public ResponseEntity<?> handleAuthRejectedException(AuthRejectedException exception) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response(false, exception.getMessage(), null));
   }
 
-  /**
-   * Handles Spring Security AuthenticationException (e.g. BadCredentialsException)
-   * and returns a 401 Unauthorized response.
-   *
-   * @param exception the exception to handle
-   * @return a ResponseEntity with a 401 Unauthorized status
-   */
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<?> handleAuthenticationException(AuthenticationException exception) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response(false, "Invalid email or password.", null));
   }
 
-  /**
-   * Handles MethodArgumentNotValidException and returns a 400 Bad Request response
-   * with validation errors.
-   *
-   * @param exception the exception to handle
-   * @return a ResponseEntity with a 400 status and validation error messages
-   */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<?> handleValidationException(MethodArgumentNotValidException exception) {
     final Map<String, String> errors = new HashMap<>();
@@ -66,12 +51,6 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest().body(response(false, "Error: Data is not valid.", errors));
   }
 
-  /**
-   * Handles all other exceptions and returns a 500 Internal Server Error response.
-   *
-   * @param exception the exception to handle
-   * @return a ResponseEntity with a 500 status and a generic error message
-   */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<?> handleGlobalException(Exception exception) {
     return ResponseEntity.internalServerError().body(response(false, exception.getMessage(), null));

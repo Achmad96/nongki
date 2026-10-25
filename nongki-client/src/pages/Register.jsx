@@ -2,12 +2,15 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../Styles/Register.css';
 import logo from '../assets/logo.png';
+import { authApi } from '../services/api';
+import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaShieldAlt } from 'react-icons/fa';
 
 function Register() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -18,13 +21,12 @@ function Register() {
         setErrorMessage('');
         setSuccessMessage('');
 
-        // Client-side validations matching backend constraints
         const trimmedName = name.trim();
         const trimmedEmail = email.trim();
         const trimmedPhone = phoneNumber.trim();
 
         if (!trimmedName) {
-            setErrorMessage('Name is required.');
+            setErrorMessage('Full name is required.');
             return;
         }
         if (trimmedName.length < 5) {
@@ -33,7 +35,7 @@ function Register() {
         }
 
         if (!trimmedEmail) {
-            setErrorMessage('Email is required.');
+            setErrorMessage('Email address is required.');
             return;
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -74,39 +76,21 @@ function Register() {
         };
 
         try {
-            // First attempt relative URL (via Vite dev proxy)
-            let response;
-            try {
-                response = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-            } catch (proxyError) {
-                // If proxy fails or backend is on another origin, try direct backend URL
-                response = await fetch('http://localhost:8081/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-            }
+            const { ok, status, data } = await authApi.register(payload);
 
-            const data = await response.json().catch(() => null);
-
-            if (response.ok && data?.success !== false) {
+            if (ok && data?.success !== false) {
                 setSuccessMessage('Account created successfully! Redirecting to login...');
                 setTimeout(() => {
                     navigate('/login');
-                }, 1500);
+                }, 1200);
             } else {
                 if (data?.data && typeof data.data === 'object') {
-                    // Extract field validation errors
                     const validationMsgs = Object.values(data.data).join(' ');
                     setErrorMessage(validationMsgs || data.message || 'Validation error.');
                 } else if (data?.message) {
                     setErrorMessage(data.message);
                 } else {
-                    setErrorMessage(`Registration failed (Status ${response.status}). Please try again.`);
+                    setErrorMessage(`Registration failed (Status ${status}). Please try again.`);
                 }
             }
         } catch (err) {
@@ -118,78 +102,129 @@ function Register() {
     };
 
     return (
-        <div className="login-page">
-            <div className="card">
-                <div>
-                    <img src={logo} alt="Logo" className="logo-login" />
-                    <h3 className="title">Create an account</h3>
+        <div className="auth-page">
+            <div className="auth-ambient-glow" />
+
+            <div className="auth-card register-card">
+                <div className="auth-header">
+                    <Link to="/" className="auth-logo-link" title="Back to Nongki Home">
+                        <img src={logo} alt="Nongki Logo" className="auth-logo" />
+                    </Link>
+                    <h1 className="auth-title">Create Account</h1>
+                    <p className="auth-subtitle">Join Nongki to reserve coworking spaces and enjoy barista perks</p>
                 </div>
 
-                <form className="register-container" onSubmit={handleSubmit}>
-                    {errorMessage && <div className="register-error-msg">{errorMessage}</div>}
-                    {successMessage && <div className="register-success-msg">{successMessage}</div>}
+                <form className="auth-form" onSubmit={handleSubmit} noValidate>
+                    {errorMessage && (
+                        <div className="auth-alert error-alert" role="alert">
+                            <span>{errorMessage}</span>
+                        </div>
+                    )}
+                    {successMessage && (
+                        <div className="auth-alert success-alert" role="status">
+                            <span>{successMessage}</span>
+                        </div>
+                    )}
 
-                    <label htmlFor="name">Name</label>
-                    <input
-                        id="name"
-                        type="text"
-                        placeholder="Full Name (min 5 chars)"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        disabled={loading}
-                    />
+                    <div className="auth-field">
+                        <label htmlFor="name">Full Name</label>
+                        <div className="input-wrapper">
+                            <FaUser className="input-icon" />
+                            <input
+                                id="name"
+                                type="text"
+                                placeholder="Your full name (min 5 characters)"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                disabled={loading}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
 
-                    <label htmlFor="email">Email</label>
-                    <input
-                        id="email"
-                        type="email"
-                        placeholder="Email (e.g. user@mail.com)"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        disabled={loading}
-                    />
+                    <div className="auth-field">
+                        <label htmlFor="email">Email Address</label>
+                        <div className="input-wrapper">
+                            <FaEnvelope className="input-icon" />
+                            <input
+                                id="email"
+                                type="email"
+                                placeholder="you@domain.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={loading}
+                            />
+                        </div>
+                    </div>
 
-                    <label htmlFor="number">Number</label>
-                    <input
-                        id="number"
-                        type="tel"
-                        placeholder="Phone Number (10-15 digits)"
-                        maxLength={15}
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                        onKeyDown={(e) => {
-                            const allowedKeys = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'];
-                            if (
-                                e.key.length === 1 &&
-                                !/[0-9]/.test(e.key) &&
-                                !allowedKeys.includes(e.key)
-                            ) {
-                                e.preventDefault();
-                            }
-                        }}
-                        disabled={loading}
-                    />
+                    <div className="auth-field">
+                        <label htmlFor="phoneNumber">Phone Number</label>
+                        <div className="input-wrapper">
+                            <FaPhone className="input-icon" />
+                            <input
+                                id="phoneNumber"
+                                type="tel"
+                                placeholder="08xxxxxxxxxx (10-15 digits)"
+                                maxLength={15}
+                                inputMode="numeric"
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                                disabled={loading}
+                            />
+                        </div>
+                    </div>
 
-                    <label htmlFor="password">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        placeholder="Password (min 8 chars)"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                    />
+                    <div className="auth-field">
+                        <label htmlFor="password">Password</label>
+                        <div className="input-wrapper">
+                            <FaLock className="input-icon" />
+                            <input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Create password (min 8 characters)"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading}
+                            />
+                            <button
+                                type="button"
+                                className="toggle-password-btn"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex="-1"
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+                    </div>
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Registering...' : 'Regist'}
+                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                        {loading ? (
+                            <span className="btn-loading-content">
+                                <span className="btn-spinner" />
+                                Registering...
+                            </span>
+                        ) : (
+                            <span className="btn-text-content">
+                                Create Account
+                                <FaArrowRight className="btn-arrow" />
+                            </span>
+                        )}
                     </button>
-
-                    <p className="register-link">
-                        Already have an account? <Link to="/login">Login</Link>
-                    </p>
                 </form>
+
+                <div className="auth-footer">
+                    <p className="switch-auth-text">
+                        Already have an account?{' '}
+                        <Link to="/login" className="auth-link">
+                            Sign in
+                        </Link>
+                    </p>
+                    <div className="auth-security-badge">
+                        <FaShieldAlt className="shield-icon" />
+                        <span>Protected by Nongki Auth Guard</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

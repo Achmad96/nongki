@@ -2,6 +2,7 @@ package me.app.nongki.service;
 
 import me.app.nongki.criteria.SpaceCriteria;
 import me.app.nongki.entity.Space;
+import me.app.nongki.exception.ResourceNotFoundException;
 import me.app.nongki.repository.SpaceRepository;
 import me.app.nongki.specification.SpaceSpecification;
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ public class SpaceService {
   }
 
   public List<Space> getSpaces(String categoryId, String type, String date, Integer startTime, Integer endTime) {
-    if (startTime >= endTime) {
+    if (startTime != null && endTime != null && startTime >= endTime) {
       log.warn("Start Time: {} can't be greater or equal to End Time: {}", startTime, endTime);
       throw new IllegalArgumentException("Start Time cannot be greater or equals to End Time");
     }
@@ -35,9 +36,13 @@ public class SpaceService {
     return spaceRepository.findAll(specification);
   }
 
+  public List<Space> getAllSpaces() {
+    return spaceRepository.findAll();
+  }
+
   public Space getSpaceById(String id) {
     return spaceRepository.findById(id)
-      .orElseThrow(() -> new IllegalArgumentException("Space not found with id: " + id));
+      .orElseThrow(() -> new ResourceNotFoundException("Space not found with id: " + id));
   }
 
   public Space createSpace(Space space) {

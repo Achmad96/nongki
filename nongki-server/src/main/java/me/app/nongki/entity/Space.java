@@ -1,5 +1,6 @@
 package me.app.nongki.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -22,6 +23,7 @@ public class Space {
   @Column(name="harga")
   private int price;
 
+  @JsonIgnore
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "space")
   private Set<SpaceDetail> spaceDetails;
 
@@ -57,5 +59,9 @@ public class Space {
 
   public Set<SpaceDetail> getSpaceDetails() {
     return spaceDetails;
+  }
+
+  public void setSpaceDetails(Set<SpaceDetail> spaceDetails) {
+    this.spaceDetails = spaceDetails;
   }
 }

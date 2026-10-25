@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import me.app.nongki.embeded.OrderDetailPrimaryKey;
 
 @Entity
-@Table(name="detail_pemesanan")
+@Table(name = "detail_pemesanan")
 public class OrderDetail {
   
   @EmbeddedId
@@ -16,13 +16,14 @@ public class OrderDetail {
   private Order order;
 
   @ManyToOne
+  @MapsId("code")
   @JoinColumn(name = "kode_space", referencedColumnName = "kode")
   private SpaceDetail spaceDetail;
 
-  @Column(name="tanggal_pesan", length = 15)
+  @Column(name = "tanggal_pesan", length = 15)
   private String date;
 
-  @Column(name="waktu_mulai")
+  @Column(name = "waktu_mulai")
   private Integer startTime;
 
   @Column(name = "waktu_akhir")
@@ -55,6 +56,10 @@ public class OrderDetail {
 
   public OrderDetailPrimaryKey getPrimaryKey() {
     return primaryKey;
+  }
+
+  public void setPrimaryKey(OrderDetailPrimaryKey primaryKey) {
+    this.primaryKey = primaryKey;
   }
 
   public void setDate(String date) {

@@ -47,8 +47,10 @@ public class SecurityConfig {
           .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
           .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
           .requestMatchers(HttpMethod.GET, "/api/auth/**").permitAll()
+          .requestMatchers(HttpMethod.GET, "/api/spaces/**").permitAll()
+          .requestMatchers(HttpMethod.GET, "/api/orders/booked-desks").permitAll()
           .anyRequest().authenticated())
-      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Use stateless sessions for JWT
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
       .httpBasic(AbstractHttpConfigurer::disable)
       .formLogin(AbstractHttpConfigurer::disable)
       .csrf(AbstractHttpConfigurer::disable)

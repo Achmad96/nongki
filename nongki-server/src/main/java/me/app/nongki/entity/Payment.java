@@ -11,25 +11,37 @@ public class Payment {
   @UuidGenerator
   private String id;
 
-  @Column(name = "metode")
-  private int method; // 1: Card, 2: QRIS
+  @Column(name = "metode", length = 50)
+  private String method; // "QRIS", "GOPAY", "CASH", "TRANSFER"
 
-  @Column(name ="total_pembayaran")
+  @Column(name = "total_pembayaran")
   private int total;
 
   @ManyToOne
   @JoinColumn(name = "id_pemesanan")
   private Order order;
 
+  public Payment() {}
+
+  public Payment(Order order, String method, int total) {
+    this.order = order;
+    this.method = method;
+    this.total = total;
+  }
+
   public String getId() {
     return id;
   }
 
-  public void setMethod(int method) {
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setMethod(String method) {
     this.method = method;
   }
 
-  public int getMethod() {
+  public String getMethod() {
     return method;
   }
 

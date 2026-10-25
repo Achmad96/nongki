@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -10,7 +10,7 @@ const AnimatedContent = ({
     animation = { from: { y: 10, opacity: 0 }, to: { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' } },
     scrollTriggerOptions = null,
 }) => {
-    const ref = useRef();
+    const ref = useRef(null);
     const hasAnimated = useRef(false);
 
     useEffect(() => {
@@ -19,12 +19,17 @@ const AnimatedContent = ({
 
         const inner = el.querySelector('.animated-content-inner') || el;
         const toOptions = scrollTriggerOptions
-            ? { ...animation.to, scrollTrigger: { trigger: inner, ...scrollTriggerOptions }}
+            ? { ...animation.to, scrollTrigger: { trigger: inner, ...scrollTriggerOptions } }
             : animation.to;
 
-        gsap.fromTo(inner, animation.from, toOptions);
+        const tween = gsap.fromTo(inner, animation.from, toOptions);
         hasAnimated.current = true;
-    }, []); // Empty dependency array to only run once
+
+        return () => {
+            tween.kill();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div ref={ref} className={`animated-content ${className}`}>

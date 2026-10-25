@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import '../Styles/SplitText.css';
@@ -13,13 +13,13 @@ const SplitText = ({
     to = { y: 0, opacity: 1, duration: 0.8, ease: 'back.out(1.7)', stagger: 0.05 },
     scrollTriggerOptions = null,
 }) => {
-    const elRef = useRef();
+    const elRef = useRef(null);
 
     useEffect(() => {
         const el = elRef.current;
         if (!el) return;
 
-        let ctx = gsap.context(() => {
+        const ctx = gsap.context(() => {
             const splitTypes = {
                 chars: '',
                 words: ' ',
@@ -29,7 +29,6 @@ const SplitText = ({
             const split = text.split(splitTypes[type] || '');
             let innerHtmlContent = split
                 .map((part, idx) => {
-                    
                     if (type === 'words') {
                         return `<span class="split-part" style="display:inline-block;">${part}</span>${idx < split.length - 1 ? ' ' : ''}`;
                     }
@@ -45,9 +44,9 @@ const SplitText = ({
 
             const targets = el.querySelectorAll('.split-part');
 
-            let tweenOptions = {
+            const tweenOptions = {
                 ...from,
-                ...to
+                ...to,
             };
 
             if (scrollTriggerOptions) {
@@ -55,7 +54,7 @@ const SplitText = ({
                     trigger: el,
                     start: 'top 80%',
                     toggleActions: 'play none none none',
-                    ...scrollTriggerOptions
+                    ...scrollTriggerOptions,
                 };
             }
 
@@ -63,7 +62,8 @@ const SplitText = ({
         }, el);
 
         return () => ctx.revert();
-    }, []); // Only run once on mount
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return <div ref={elRef} className={className}></div>;
 };

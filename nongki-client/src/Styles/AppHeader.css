@@ -1,0 +1,185 @@
+.app-header {
+    width: 100%;
+    height: 70px;
+    background: #0f172a;
+    border-bottom: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(20px, 3.5vw, 64px);
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header-brand .brand-logo {
+    height: 28px;
+    width: auto;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.header-brand .brand-logo:hover {
+    opacity: 0.9;
+}
+
+/* Stepper */
+.header-stepper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.step-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.step-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.step-item.active {
+    color: #feb600;
+}
+
+.step-item.active .step-badge {
+    background: #feb600;
+    border-color: #feb600;
+    color: #0f172a;
+    box-shadow: 0 0 12px rgba(254, 182, 0, 0.35);
+}
+
+.step-item.completed {
+    color: #10b981;
+}
+
+.step-item.completed .step-badge {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.step-connector {
+    width: 32px;
+    height: 2px;
+    background: #1e293b;
+    border-radius: 1px;
+    transition: background 0.2s ease;
+}
+
+.step-connector.filled {
+    background: #10b981;
+}
+
+/* Actions */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.action-btn {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #e2e8f0;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.action-btn:hover {
+    background: #334155;
+    color: #feb600;
+    border-color: #475569;
+}
+
+.history-btn {
+    position: relative;
+}
+
+.history-badge {
+    background: #feb600;
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 6px;
+    min-width: 14px;
+    text-align: center;
+}
+
+.user-profile-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid #334155;
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #cbd5e1;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.user-avatar {
+    font-size: 16px;
+    color: #feb600;
+}
+
+.logout-btn {
+    padding: 8px 10px;
+    color: #94a3b8;
+}
+
+.logout-btn:hover {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0 16px;
+    }
+    .header-stepper {
+        display: none;
+    }
+    .btn-text {
+        display: none;
+    }
+    .user-name {
+        display: none;
+    }
+}

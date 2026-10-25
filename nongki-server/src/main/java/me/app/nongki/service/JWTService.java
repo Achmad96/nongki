@@ -23,6 +23,8 @@ public class JWTService {
   @Value("${security.jwt.expiration-time}")
   private long TOKEN_VALIDITY;
 
+  private volatile SecretKey cachedSignInKey;
+
   public String generateToken(String email) {
     final Map<String, Object> claims = new HashMap<>();
     return createToken(claims, email);
@@ -69,7 +71,14 @@ public class JWTService {
   }
 
   private SecretKey getSignInKey() {
-    final byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-    return Keys.hmacShaKeyFor(keyBytes);
+    if (cachedSignInKey == null) {
+      synchronized (this) {
+        if (cachedSignInKey == null) {
+          final byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+          cachedSignInKey = Keys.hmacShaKeyFor(keyBytes);
+        }
+      }
+    }
+    return cachedSignInKey;
   }
 }

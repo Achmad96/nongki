@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,28 +25,31 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JWTService jwtService) {
+    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, JWTService jwtService, PasswordEncoder passwordEncoder) {
       this.authenticationManager = authenticationManager;
       this.userRepository = userRepository;
-        this.jwtService = jwtService;
-      this.passwordEncoder = new BCryptPasswordEncoder();
+      this.jwtService = jwtService;
+      this.passwordEncoder = passwordEncoder;
     }
 
     public void register(String email, String name, String password, String nomorTelepon) {
         if (userRepository.findbyEmail(email) != null) {
-            throw new RuntimeException("User already exists with name: " + name);
+            throw new RuntimeException("User already exists with email: " + email);
         }
         final String hashedPassword = passwordEncoder.encode(password);
         final User user = new User(email, name, hashedPassword, nomorTelepon);
         userRepository.save(user);
-        log.info("Registered user with name: {} and id: {}", name, user.getId());
+        log.info("Registered user with email: {} and id: {}", email, user.getId());
     }
 
-    public HashMap<String, String> authenticate(String email, String password) {
+    public HashMap<String, String> authenticate(String identifier, String password) {
+        String email = identifier;
+        if ("admin".equalsIgnoreCase(identifier)) {
+          email = "admin@nongki.id";
+        }
+
         authenticationManager.authenticate(
-          new UsernamePasswordAuthenticationToken(
-            email, password
-          )
+          new UsernamePasswordAuthenticationToken(email, password)
         );
 
         final User user = userRepository.findbyEmail(email);

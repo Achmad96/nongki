@@ -1,5 +1,6 @@
 package me.app.nongki.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.HashSet;
@@ -15,9 +16,9 @@ public class SpaceDetail {
 
   @ManyToOne
   @JoinColumn(name = "id_space", referencedColumnName = "id")
-  @MapsId("spaceId")
   private Space space;
 
+  @JsonIgnore
   @OneToMany(mappedBy = "spaceDetail", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<OrderDetail> orderDetails = new HashSet<OrderDetail>();
 
@@ -34,6 +35,10 @@ public class SpaceDetail {
 
   public Space getSpace() {
     return space;
+  }
+
+  public void setSpace(Space space) {
+    this.space = space;
   }
 
   public Set<OrderDetail> getOrderDetails() {

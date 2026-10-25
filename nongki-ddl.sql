@@ -111,8 +111,8 @@ create table pemesanan
 
 create table detail_pemesanan
 (
-    id_pemesanan  char(36) not null
-        primary key,
+    id_pemesanan  char(36) not null,
+    primary key (id_pemesanan, kode_space),
     waktu_mulai   tinyint  not null,
     waktu_akhir   tinyint  not null,
     tanggal_pesan date     not null,
@@ -130,11 +130,11 @@ create index id_pemesanan
 
 create table pembayaran
 (
-    id               char(8)     not null
+    id               varchar(36) not null
         primary key,
     id_pemesanan     char(36)    null,
     total_pembayaran int         null,
-    metode           varchar(15) null,
+    metode           varchar(50) null,
     constraint pembayaran_pemesanan_id_fk
         foreign key (id_pemesanan) references pemesanan (id)
             on delete cascade
@@ -150,3 +150,18 @@ create index id_karyawan
 create index id_user
     on pemesanan (id_user);
 
+
+
+create table idempotency_record
+(
+    idempotency_key varchar(100) not null
+        primary key,
+    user_id         varchar(36)  null,
+    request_hash    varchar(64)  null,
+    status          varchar(20)  not null,
+    response_code   int          null,
+    response_body   text         null,
+    created_at      timestamp    default current_timestamp,
+    updated_at      timestamp    default current_timestamp on update current_timestamp
+)
+    collate = utf8mb4_general_ci;

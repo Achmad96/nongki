@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import '../Styles/Login.css';
 import logo from '../assets/logo.png';
+import { authApi, setAuthToken } from '../services/api';
+import { FaUser, FaLock, FaEye, FaEyeSlash, FaArrowRight, FaShieldAlt } from 'react-icons/fa';
 
 function Login() {
     const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [loading, setLoading] = useState(false);
@@ -18,59 +21,27 @@ function Login() {
 
         const trimmedIdentifier = identifier.trim();
         if (!trimmedIdentifier) {
-            setErrorMessage('Email or username is required.');
+            setErrorMessage('Please enter your email or username.');
             return;
         }
 
         if (!password) {
-            setErrorMessage('Password is required.');
-            return;
-        }
-
-        // Quick demo bypass
-        if (trimmedIdentifier === 'admin' && password === '123') {
-            localStorage.setItem('userEmail', 'admin@nongki.id');
-            localStorage.setItem('token', 'demo-admin-token');
-            navigate('/order');
+            setErrorMessage('Please enter your password.');
             return;
         }
 
         setLoading(true);
 
-        const payload = {
-            email: trimmedIdentifier,
-            password: password,
-        };
-
         try {
-            let response;
-            try {
-                response = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-            } catch (proxyError) {
-                // If proxy fails, try direct backend URL
-                response = await fetch('http://localhost:8081/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-            }
+            const { ok, data } = await authApi.login(trimmedIdentifier, password);
 
-            const data = await response.json().catch(() => null);
-
-            if (response.ok && data?.token) {
-                localStorage.setItem('token', data.token);
-                if (data.expireIn) {
-                    localStorage.setItem('tokenExpireIn', data.expireIn);
-                }
-                localStorage.setItem('userEmail', trimmedIdentifier);
-                setSuccessMessage('Login successful! Redirecting...');
+            if (ok && data?.token) {
+                const resolvedEmail = trimmedIdentifier === 'admin' ? 'admin@nongki.id' : trimmedIdentifier;
+                setAuthToken(data.token, data.expireIn, resolvedEmail);
+                setSuccessMessage('Welcome back! Redirecting to reservation...');
                 setTimeout(() => {
                     navigate('/order');
-                }, 500);
+                }, 400);
             } else {
                 if (data?.data && typeof data.data === 'object') {
                     const validationMsgs = Object.values(data.data).join(' ');
@@ -78,7 +49,7 @@ function Login() {
                 } else if (data?.message) {
                     setErrorMessage(data.message);
                 } else {
-                    setErrorMessage('Invalid email or password.');
+                    setErrorMessage('Invalid username or password. Please try again.');
                 }
             }
         } catch (err) {
@@ -89,46 +60,114 @@ function Login() {
         }
     };
 
+    const fillDemoAdmin = () => {
+        setIdentifier('admin');
+        setPassword('123');
+        setErrorMessage('');
+    };
+
     return (
-        <div className="login-page">
-            <div className="card">
-                <div>
-                    <img src={logo} alt="Logo" className="logo-login" />
-                    <h3 className="title">Login into your account</h3>
+        <div className="auth-page">
+            <div className="auth-ambient-glow" />
+
+            <div className="auth-card">
+                <div className="auth-header">
+                    <Link to="/" className="auth-logo-link" title="Back to Nongki Home">
+                        <img src={logo} alt="Nongki Logo" className="auth-logo" />
+                    </Link>
+                    <h1 className="auth-title">Welcome Back</h1>
+                    <p className="auth-subtitle">Sign in to book your favorite workspace & coffee spot</p>
                 </div>
 
-                <form className="login-container" onSubmit={handleLogin}>
-                    {errorMessage && <div className="login-error-msg">{errorMessage}</div>}
-                    {successMessage && <div className="login-success-msg">{successMessage}</div>}
+                <form className="auth-form" onSubmit={handleLogin} noValidate>
+                    {errorMessage && (
+                        <div className="auth-alert error-alert" role="alert">
+                            <span>{errorMessage}</span>
+                        </div>
+                    )}
+                    {successMessage && (
+                        <div className="auth-alert success-alert" role="status">
+                            <span>{successMessage}</span>
+                        </div>
+                    )}
 
-                    <label htmlFor="identifier">Email / Username</label>
-                    <input
-                        id="identifier"
-                        type="text"
-                        placeholder="Email or Username"
-                        value={identifier}
-                        onChange={(e) => setIdentifier(e.target.value)}
-                        disabled={loading}
-                    />
+                    <div className="auth-field">
+                        <label htmlFor="identifier">Email or Username</label>
+                        <div className="input-wrapper">
+                            <FaUser className="input-icon" />
+                            <input
+                                id="identifier"
+                                type="text"
+                                placeholder="name@domain.com or admin"
+                                value={identifier}
+                                onChange={(e) => setIdentifier(e.target.value)}
+                                disabled={loading}
+                                autoFocus
+                            />
+                        </div>
+                    </div>
 
-                    <label htmlFor="password">Password</label>
-                    <input
-                        id="password"
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        disabled={loading}
-                    />
+                    <div className="auth-field">
+                        <div className="field-label-row">
+                            <label htmlFor="password">Password</label>
+                            <button
+                                type="button"
+                                className="demo-fill-btn"
+                                onClick={fillDemoAdmin}
+                                title="Click to autofill default demo admin credentials"
+                            >
+                                Use Demo Admin
+                            </button>
+                        </div>
+                        <div className="input-wrapper">
+                            <FaLock className="input-icon" />
+                            <input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading}
+                            />
+                            <button
+                                type="button"
+                                className="toggle-password-btn"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex="-1"
+                                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
+                    </div>
 
-                    <button type="submit" disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                    <button type="submit" className="auth-submit-btn" disabled={loading}>
+                        {loading ? (
+                            <span className="btn-loading-content">
+                                <span className="btn-spinner" />
+                                Authenticating...
+                            </span>
+                        ) : (
+                            <span className="btn-text-content">
+                                Sign In
+                                <FaArrowRight className="btn-arrow" />
+                            </span>
+                        )}
                     </button>
-
-                    <p className="register-link">
-                        Don't have an account? <Link to="/register">Register</Link>
-                    </p>
                 </form>
+
+                <div className="auth-footer">
+                    <p className="switch-auth-text">
+                        Don't have an account?{' '}
+                        <Link to="/register" className="auth-link">
+                            Create account
+                        </Link>
+                    </p>
+                    <div className="auth-security-badge">
+                        <FaShieldAlt className="shield-icon" />
+                        <span>Protected by Nongki Auth Guard</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

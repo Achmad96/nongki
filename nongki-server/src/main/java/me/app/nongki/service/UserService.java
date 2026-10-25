@@ -26,13 +26,13 @@ public class UserService {
     public User updateUser(String id, User user) {
         final User existingUser = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        if (user.getUsername() != null) {
-            existingUser.setName(user.getUsername());
+        if (user.getName() != null && !user.getName().isBlank()) {
+            existingUser.setName(user.getName());
         }
-        if (user.getPhoneNumber() != null) {
+        if (user.getPhoneNumber() != null && !user.getPhoneNumber().isBlank()) {
             existingUser.setPhoneNumber(user.getPhoneNumber());
         }
-        log.info("Updating user with id: {} and name: {}", id, existingUser.getUsername());
+        log.info("Updating user with id: {} and name: {}", id, existingUser.getName());
         return userRepository.save(existingUser);
     }
 
