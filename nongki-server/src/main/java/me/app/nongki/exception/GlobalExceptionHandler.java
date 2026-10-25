@@ -1,6 +1,8 @@
 package me.app.nongki.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,14 +26,26 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles AuthRejectedException and returns a 406 Not Acceptable.
+   * Handles AuthRejectedException and returns a 401 Unauthorized status.
    *
    * @param exception the exception to handle
-   * @return a ResponseEntity with a 406 Not Acceptable status and the exception message
+   * @return a ResponseEntity with a 401 Unauthorized status and the exception message
    */
   @ExceptionHandler(AuthRejectedException.class)
   public ResponseEntity<?> handleAuthRejectedException(AuthRejectedException exception) {
-    return ResponseEntity.status(406).body(response(false, exception.getMessage(), null));
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response(false, exception.getMessage(), null));
+  }
+
+  /**
+   * Handles Spring Security AuthenticationException (e.g. BadCredentialsException)
+   * and returns a 401 Unauthorized response.
+   *
+   * @param exception the exception to handle
+   * @return a ResponseEntity with a 401 Unauthorized status
+   */
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<?> handleAuthenticationException(AuthenticationException exception) {
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response(false, "Invalid email or password.", null));
   }
 
   /**
@@ -51,7 +65,6 @@ public class GlobalExceptionHandler {
     });
     return ResponseEntity.badRequest().body(response(false, "Error: Data is not valid.", errors));
   }
-
 
   /**
    * Handles all other exceptions and returns a 500 Internal Server Error response.

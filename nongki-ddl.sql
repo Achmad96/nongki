@@ -91,7 +91,7 @@ create table user
         primary key,
     nama          varchar(50)  null,
     email         varchar(50)  null,
-    nomor_telepon varchar(12)  null,
+    nomor_telepon varchar(20)  null,
     password      varchar(255) null
 )
     collate = utf8mb4_general_ci;

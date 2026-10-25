@@ -2,6 +2,7 @@ package me.app.nongki.controller;
 
 import jakarta.validation.Valid;
 import me.app.nongki.dto.AuthDTO;
+import me.app.nongki.dto.LoginRequest;
 import me.app.nongki.entity.User;
 import me.app.nongki.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import static me.app.nongki.util.ResponseUtil.response;
 
 @RestController
-@RequestMapping("/api/auth/")
+@RequestMapping("/api/auth")
 @ResponseBody
 public class AuthController {
 
@@ -32,8 +33,12 @@ public class AuthController {
   }
 
   @PostMapping(value = "/login")
-  public ResponseEntity<?> login(@Valid @RequestBody User user) {
-    final HashMap<String, String> tokenResponse = authService.authenticate(user.getEmail(), user.getPassword());
+  public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+    final String identifier = request.getEmail();
+    if (identifier == null || identifier.isBlank()) {
+      return ResponseEntity.badRequest().body(response(false, "Email or username is required", null));
+    }
+    final HashMap<String, String> tokenResponse = authService.authenticate(identifier, request.getPassword());
     return ResponseEntity.status(HttpStatus.OK).body(
         new AuthDTO(tokenResponse.get("token"), tokenResponse.get("expireIn"))
     );

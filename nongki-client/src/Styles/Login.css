@@ -81,6 +81,40 @@ html, body {
     border-radius: 4px;
     cursor: pointer;
     margin-top: 10px;
+    transition: background-color 0.2s;
+}
+
+.login-container button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.login-container button:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+}
+
+.login-error-msg {
+    width: 75%;
+    color: #ff6b6b;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    text-align: center;
+    background-color: rgba(255, 0, 0, 0.15);
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.login-success-msg {
+    width: 75%;
+    color: #51cf66;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    text-align: center;
+    background-color: rgba(81, 207, 102, 0.15);
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(81, 207, 102, 0.3);
 }
 
 .register-link {
@@ -88,4 +122,9 @@ html, body {
     text-decoration: none;
     margin: 10px 0;
     font-size: small;
+}
+
+.register-link a {
+    color: #339af0;
+    text-decoration: underline;
 }
